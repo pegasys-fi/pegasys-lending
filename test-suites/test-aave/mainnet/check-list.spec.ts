@@ -6,7 +6,7 @@ import { DRE, waitForTx } from '../../../helpers/misc-utils';
 import { BigNumber } from 'ethers';
 import { getStableDebtToken, getVariableDebtToken } from '../../../helpers/contracts-getters';
 import { deploySelfdestructTransferMock } from '../../../helpers/contracts-deployments';
-import { IUniswapV2Router02Factory } from '../../../types/IUniswapV2Router02Factory';
+import { IUniswapV2Router02Factory } from '../../../typechain/IUniswapV2Router02Factory';
 
 const { expect } = require('chai');
 

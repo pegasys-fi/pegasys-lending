@@ -33,8 +33,8 @@ import {
   WETH9MockedFactory,
   WETHGatewayFactory,
   FlashLiquidationAdapterFactory,
-} from '../types';
-import { IERC20DetailedFactory } from '../types/IERC20DetailedFactory';
+} from '../typechain';
+import { IERC20DetailedFactory } from '../typechain/IERC20DetailedFactory';
 import { getEthersSigners, MockTokenMap } from './contracts-helpers';
 import { DRE, getDb, notFalsyOrZeroAddress, omit } from './misc-utils';
 import { eContractid, PoolConfiguration, tEthereumAddress, TokenContractId } from './types';

@@ -2,7 +2,6 @@ import { task } from 'hardhat/config';
 import { checkVerification } from '../../helpers/etherscan-verification';
 import { ConfigNames, getEmergencyAdmin, loadPoolConfig } from '../../helpers/configuration';
 import { printContracts } from '../../helpers/misc-utils';
-import { usingTenderly } from '../../helpers/tenderly-utils';
 import { getLendingPoolConfiguratorProxy } from '../../helpers/contracts-getters';
 
 task('aave:mainnet', 'Deploy development enviroment')
@@ -59,13 +58,6 @@ task('aave:mainnet', 'Deploy development enviroment')
       await DRE.run('verify:tokens', { pool: POOL_NAME });
     }
 
-    if (usingTenderly()) {
-      const postDeployHead = DRE.tenderlyNetwork.getHead();
-      const postDeployFork = DRE.tenderlyNetwork.getFork();
-      console.log('Tenderly Info');
-      console.log('- Head', postDeployHead);
-      console.log('- Fork', postDeployFork);
-    }
     console.log('\nFinished migrations');
     printContracts();
   });

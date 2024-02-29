@@ -4,7 +4,7 @@ import { APPROVAL_AMOUNT_LENDING_POOL, oneEther } from '../../helpers/constants'
 import { convertToCurrencyDecimals } from '../../helpers/contracts-helpers';
 import { parseEther, parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'bignumber.js';
-import { MockFlashLoanReceiver } from '../../types/MockFlashLoanReceiver';
+import { MockFlashLoanReceiver } from '../../typechain/MockFlashLoanReceiver';
 import { getMockFlashLoanReceiver } from '../../helpers/contracts-getters';
 
 const { expect } = require('chai');

@@ -1,7 +1,7 @@
 import { makeSuite, TestEnv } from './helpers/make-suite';
 import { convertToCurrencyDecimals } from '../../helpers/contracts-helpers';
 import { getMockUniswapRouter } from '../../helpers/contracts-getters';
-import { MockUniswapV2Router02 } from '../../types/MockUniswapV2Router02';
+import { MockUniswapV2Router02 } from '../../typechain/MockUniswapV2Router02';
 import BigNumber from 'bignumber.js';
 import { evmRevert, evmSnapshot } from '../../helpers/misc-utils';
 import { ethers } from 'ethers';

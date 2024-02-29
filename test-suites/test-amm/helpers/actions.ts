@@ -31,7 +31,7 @@ import { advanceTimeAndBlock, DRE, timeLatest, waitForTx } from '../../../helper
 import chai from 'chai';
 import { ReserveData, UserReserveData } from './utils/interfaces';
 import { ContractReceipt } from 'ethers';
-import { AToken } from '../../../types/AToken';
+import { AToken } from '../../../typechain/AToken';
 import { RateMode, tEthereumAddress } from '../../../helpers/types';
 
 const { expect } = chai;

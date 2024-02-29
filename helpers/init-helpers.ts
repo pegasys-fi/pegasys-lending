@@ -5,7 +5,7 @@ import {
   IReserveParams,
   tEthereumAddress,
 } from './types';
-import { AaveProtocolDataProvider } from '../types/AaveProtocolDataProvider';
+import { AaveProtocolDataProvider } from '../typechain/AaveProtocolDataProvider';
 import { chunk, getDb, waitForTx } from './misc-utils';
 import {
   getAToken,
@@ -156,7 +156,6 @@ export const initReservesByHelper = async (
   // Deploy init reserves per chunks
   const chunkedSymbols = chunk(reserveSymbols, initChunks);
   const chunkedInitInputParams = chunk(initInputParams, initChunks);
-
   const configurator = await getLendingPoolConfiguratorProxy();
 
   console.log(`- Reserves initialization in ${chunkedInitInputParams.length} txs`);

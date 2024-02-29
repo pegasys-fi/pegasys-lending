@@ -2,9 +2,9 @@ import { expect } from 'chai';
 import { makeSuite, TestEnv } from './helpers/make-suite';
 import { ProtocolErrors, eContractid } from '../../helpers/types';
 import { deployContract, getContract } from '../../helpers/contracts-helpers';
-import { MockAToken } from '../../types/MockAToken';
-import { MockStableDebtToken } from '../../types/MockStableDebtToken';
-import { MockVariableDebtToken } from '../../types/MockVariableDebtToken';
+import { MockAToken } from '../../typechain/MockAToken';
+import { MockStableDebtToken } from '../../typechain/MockStableDebtToken';
+import { MockVariableDebtToken } from '../../typechain/MockVariableDebtToken';
 import { ZERO_ADDRESS } from '../../helpers/constants';
 import {
   getAToken,

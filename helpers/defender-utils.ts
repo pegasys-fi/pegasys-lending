@@ -3,7 +3,6 @@ import { DefenderRelaySigner, DefenderRelayProvider } from 'defender-relay-clien
 import { Signer } from 'ethers';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DRE, impersonateAccountsHardhat } from './misc-utils';
-import { usingTenderly } from './tenderly-utils';
 
 export const usingDefender = () => process.env.DEFENDER === 'true';
 
@@ -30,11 +29,7 @@ export const getDefenderRelaySigner = async () => {
     await impersonateAccountsHardhat([defenderAddress]);
     defenderSigner = await (DRE as HardhatRuntimeEnvironment).ethers.getSigner(defenderAddress);
   }
-  // Replace signer if Tenderly network is active
-  if (usingTenderly()) {
-    console.log('  - Impersonating Defender Relay via Tenderly');
-    defenderSigner = await (DRE as HardhatRuntimeEnvironment).ethers.getSigner(defenderAddress);
-  }
+
   console.log('  - Balance: ', formatEther(await defenderSigner.getBalance()));
 
   return defenderSigner;

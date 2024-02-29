@@ -1,4 +1,4 @@
-import { LendingPool } from '../../../../types/LendingPool';
+import { LendingPool } from '../../../../typechain/LendingPool';
 import { ReserveData, UserReserveData } from './interfaces';
 import {
   getLendingRateOracle,
@@ -11,7 +11,7 @@ import {
 import { tEthereumAddress } from '../../../../helpers/types';
 import BigNumber from 'bignumber.js';
 import { getDb, DRE } from '../../../../helpers/misc-utils';
-import { AaveProtocolDataProvider } from '../../../../types/AaveProtocolDataProvider';
+import { AaveProtocolDataProvider } from '../../../../typechain/AaveProtocolDataProvider';
 
 export const getReserveData = async (
   helper: AaveProtocolDataProvider,

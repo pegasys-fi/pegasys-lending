@@ -4,10 +4,10 @@ import { TestEnv, makeSuite } from './helpers/make-suite';
 import { APPROVAL_AMOUNT_LENDING_POOL, oneRay } from '../../helpers/constants';
 import { convertToCurrencyDecimals, getContract } from '../../helpers/contracts-helpers';
 import { ethers } from 'ethers';
-import { MockFlashLoanReceiver } from '../../types/MockFlashLoanReceiver';
+import { MockFlashLoanReceiver } from '../../typechain/MockFlashLoanReceiver';
 import { ProtocolErrors, eContractid } from '../../helpers/types';
-import { VariableDebtToken } from '../../types/VariableDebtToken';
-import { StableDebtToken } from '../../types/StableDebtToken';
+import { VariableDebtToken } from '../../typechain/VariableDebtToken';
+import { StableDebtToken } from '../../typechain/StableDebtToken';
 import {
   getMockFlashLoanReceiver,
   getStableDebtToken,

@@ -17,9 +17,9 @@ import {
   deployDelegationAwareAToken,
   deployMintableDelegationERC20,
 } from '../../helpers/contracts-deployments';
-import { DelegationAwareATokenFactory } from '../../types';
-import { DelegationAwareAToken } from '../../types/DelegationAwareAToken';
-import { MintableDelegationERC20 } from '../../types/MintableDelegationERC20';
+import { DelegationAwareATokenFactory } from '../../typechain';
+import { DelegationAwareAToken } from '../../typechain/DelegationAwareAToken';
+import { MintableDelegationERC20 } from '../../typechain/MintableDelegationERC20';
 import AmmConfig from '../../markets/amm';
 
 const { parseEther } = ethers.utils;

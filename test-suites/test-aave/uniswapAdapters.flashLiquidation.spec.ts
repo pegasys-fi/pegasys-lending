@@ -5,7 +5,7 @@ import {
 } from '../../helpers/contracts-helpers';
 import { getMockUniswapRouter } from '../../helpers/contracts-getters';
 import { deployFlashLiquidationAdapter } from '../../helpers/contracts-deployments';
-import { MockUniswapV2Router02 } from '../../types/MockUniswapV2Router02';
+import { MockUniswapV2Router02 } from '../../typechain/MockUniswapV2Router02';
 import BigNumber from 'bignumber.js';
 import { DRE, evmRevert, evmSnapshot, increaseTime, waitForTx } from '../../helpers/misc-utils';
 import { ethers } from 'ethers';
@@ -213,15 +213,8 @@ makeSuite('Uniswap adapters', (testEnv: TestEnv) => {
         await depositAndHFBelowOne();
         await increaseTime(100);
 
-        const {
-          dai,
-          weth,
-          users,
-          pool,
-          oracle,
-          helpersContract,
-          flashLiquidationAdapter,
-        } = testEnv;
+        const { dai, weth, users, pool, oracle, helpersContract, flashLiquidationAdapter } =
+          testEnv;
 
         const liquidator = users[3];
         const borrower = users[1];
@@ -460,15 +453,8 @@ makeSuite('Uniswap adapters', (testEnv: TestEnv) => {
         await depositAndHFBelowOne();
         await increaseTime(100);
 
-        const {
-          dai,
-          weth,
-          users,
-          pool,
-          oracle,
-          helpersContract,
-          flashLiquidationAdapter,
-        } = testEnv;
+        const { dai, weth, users, pool, oracle, helpersContract, flashLiquidationAdapter } =
+          testEnv;
 
         const liquidator = users[3];
         const borrower = users[1];
@@ -615,15 +601,8 @@ makeSuite('Uniswap adapters', (testEnv: TestEnv) => {
         await depositAndHFBelowOne();
         await increaseTime(100);
 
-        const {
-          dai,
-          weth,
-          users,
-          pool,
-          oracle,
-          helpersContract,
-          flashLiquidationAdapter,
-        } = testEnv;
+        const { dai, weth, users, pool, oracle, helpersContract, flashLiquidationAdapter } =
+          testEnv;
 
         const liquidator = users[3];
         const borrower = users[1];

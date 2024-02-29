@@ -14,16 +14,7 @@ const okErrors = [`Contract source code already verified`, 'Already Verified'];
 
 const unableVerifyError = 'Fail - Unable to verify';
 
-export const SUPPORTED_ETHERSCAN_NETWORKS = [
-  'main',
-  'ropsten',
-  'kovan',
-  'matic',
-  'mumbai',
-  'goerli',
-  'avalanche',
-  'fuji',
-];
+export const SUPPORTED_ETHERSCAN_NETWORKS = ['main'];
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -36,9 +27,6 @@ export const verifyEtherscanContract = async (
 ) => {
   const currentNetwork = DRE.network.name;
 
-  if (!process.env.ETHERSCAN_KEY) {
-    throw Error('Missing process.env.ETHERSCAN_KEY.');
-  }
   if (!SUPPORTED_ETHERSCAN_NETWORKS.includes(currentNetwork)) {
     throw Error(
       `Current network ${currentNetwork} not supported. Please change to one of the next networks: ${SUPPORTED_ETHERSCAN_NETWORKS.toString()}`
@@ -121,10 +109,7 @@ export const runTaskWithRetry = async (
 
 export const checkVerification = () => {
   const currentNetwork = DRE.network.name;
-  if (!process.env.ETHERSCAN_KEY) {
-    console.error('Missing process.env.ETHERSCAN_KEY.');
-    exit(3);
-  }
+
   if (!SUPPORTED_ETHERSCAN_NETWORKS.includes(currentNetwork)) {
     console.error(
       `Current network ${currentNetwork} not supported. Please change to one of the next networks: ${SUPPORTED_ETHERSCAN_NETWORKS.toString()}`

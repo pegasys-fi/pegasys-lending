@@ -11,7 +11,7 @@ import {
   PoolConfiguration,
   eEthereumNetwork,
 } from './types';
-import { MintableERC20 } from '../types/MintableERC20';
+import { MintableERC20 } from '../typechain/MintableERC20';
 import { MockContract } from 'ethereum-waffle';
 import { ConfigNames, getReservesConfigByPool, loadPoolConfig } from './configuration';
 import { getFirstSigner } from './contracts-getters';
@@ -55,7 +55,7 @@ import {
   UiPoolDataProviderV2V3Factory,
   UiIncentiveDataProviderV2V3,
   UiIncentiveDataProviderV2Factory,
-} from '../types';
+} from '../typechain';
 import {
   withSaveAndVerify,
   registerContractInJsonDb,
@@ -65,12 +65,12 @@ import {
   verifyContract,
   getOptionalParamAddressPerNetwork,
 } from './contracts-helpers';
-import { StableAndVariableTokensHelperFactory } from '../types/StableAndVariableTokensHelperFactory';
-import { MintableDelegationERC20 } from '../types/MintableDelegationERC20';
+import { StableAndVariableTokensHelperFactory } from '../typechain/StableAndVariableTokensHelperFactory';
+import { MintableDelegationERC20 } from '../typechain/MintableDelegationERC20';
 import { readArtifact as buidlerReadArtifact } from '@nomiclabs/buidler/plugins';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { LendingPoolLibraryAddresses } from '../types/LendingPoolFactory';
-import { UiPoolDataProvider } from '../types';
+import { LendingPoolLibraryAddresses } from '../typechain/LendingPoolFactory';
+import { UiPoolDataProvider } from '../typechain';
 import { eNetwork } from './types';
 
 export const deployUiIncentiveDataProviderV2 = async (verify?: boolean) =>

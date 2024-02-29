@@ -1,6 +1,6 @@
 import { task } from 'hardhat/config';
 
-import { UniswapLiquiditySwapAdapterFactory } from '../../types';
+import { UniswapLiquiditySwapAdapterFactory } from '../../typechain';
 import { verifyContract } from '../../helpers/contracts-helpers';
 import { getFirstSigner } from '../../helpers/contracts-getters';
 import { eContractid } from '../../helpers/types';

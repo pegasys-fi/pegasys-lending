@@ -32,7 +32,7 @@ import {
 } from '../../helpers/contracts-deployments';
 import { Signer } from 'ethers';
 import { TokenContractId, eContractid, tEthereumAddress, AavePools } from '../../helpers/types';
-import { MintableERC20 } from '../../types/MintableERC20';
+import { MintableERC20 } from '../../typechain/MintableERC20';
 import {
   ConfigNames,
   getReservesConfigByPool,
@@ -55,7 +55,7 @@ import {
   getLendingPoolConfiguratorProxy,
   getPairsTokenAggregator,
 } from '../../helpers/contracts-getters';
-import { WETH9Mocked } from '../../types/WETH9Mocked';
+import { WETH9Mocked } from '../../typechain/WETH9Mocked';
 
 const MOCK_USD_PRICE_IN_WEI = AmmConfig.ProtocolGlobalParams.MockUsdPriceInWei;
 const ALL_ASSETS_INITIAL_PRICES = AmmConfig.Mocks.AllAssetsInitialPrices;

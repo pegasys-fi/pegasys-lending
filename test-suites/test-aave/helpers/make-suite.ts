@@ -17,31 +17,30 @@ import {
   getParaSwapLiquiditySwapAdapter,
 } from '../../../helpers/contracts-getters';
 import { eEthereumNetwork, eNetwork, tEthereumAddress } from '../../../helpers/types';
-import { LendingPool } from '../../../types/LendingPool';
-import { AaveProtocolDataProvider } from '../../../types/AaveProtocolDataProvider';
-import { MintableERC20 } from '../../../types/MintableERC20';
-import { AToken } from '../../../types/AToken';
-import { LendingPoolConfigurator } from '../../../types/LendingPoolConfigurator';
+import { LendingPool } from '../../../typechain/LendingPool';
+import { AaveProtocolDataProvider } from '../../../typechain/AaveProtocolDataProvider';
+import { MintableERC20 } from '../../../typechain/MintableERC20';
+import { AToken } from '../../../typechain/AToken';
+import { LendingPoolConfigurator } from '../../../typechain/LendingPoolConfigurator';
 
 import chai from 'chai';
 // @ts-ignore
 import bignumberChai from 'chai-bignumber';
 import { almostEqual } from './almost-equal';
-import { PriceOracle } from '../../../types/PriceOracle';
-import { LendingPoolAddressesProvider } from '../../../types/LendingPoolAddressesProvider';
-import { LendingPoolAddressesProviderRegistry } from '../../../types/LendingPoolAddressesProviderRegistry';
+import { PriceOracle } from '../../../typechain/PriceOracle';
+import { LendingPoolAddressesProvider } from '../../../typechain/LendingPoolAddressesProvider';
+import { LendingPoolAddressesProviderRegistry } from '../../../typechain/LendingPoolAddressesProviderRegistry';
 import { getEthersSigners } from '../../../helpers/contracts-helpers';
-import { UniswapLiquiditySwapAdapter } from '../../../types/UniswapLiquiditySwapAdapter';
-import { UniswapRepayAdapter } from '../../../types/UniswapRepayAdapter';
-import { ParaSwapLiquiditySwapAdapter } from '../../../types/ParaSwapLiquiditySwapAdapter';
+import { UniswapLiquiditySwapAdapter } from '../../../typechain/UniswapLiquiditySwapAdapter';
+import { UniswapRepayAdapter } from '../../../typechain/UniswapRepayAdapter';
+import { ParaSwapLiquiditySwapAdapter } from '../../../typechain/ParaSwapLiquiditySwapAdapter';
 import { getParamPerNetwork } from '../../../helpers/contracts-helpers';
-import { WETH9Mocked } from '../../../types/WETH9Mocked';
-import { WETHGateway } from '../../../types/WETHGateway';
+import { WETH9Mocked } from '../../../typechain/WETH9Mocked';
+import { WETHGateway } from '../../../typechain/WETHGateway';
 import { solidity } from 'ethereum-waffle';
 import { AaveConfig } from '../../../markets/aave';
-import { FlashLiquidationAdapter } from '../../../types';
+import { FlashLiquidationAdapter } from '../../../typechain';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { usingTenderly } from '../../../helpers/tenderly-utils';
 
 chai.use(bignumberChai());
 chai.use(almostEqual());
@@ -168,19 +167,12 @@ export async function initializeMakeSuite() {
 
 const setSnapshot = async () => {
   const hre = DRE as HardhatRuntimeEnvironment;
-  if (usingTenderly()) {
-    setBuidlerevmSnapshotId((await hre.tenderlyNetwork.getHead()) || '0x1');
-    return;
-  }
   setBuidlerevmSnapshotId(await evmSnapshot());
 };
 
 const revertHead = async () => {
   const hre = DRE as HardhatRuntimeEnvironment;
-  if (usingTenderly()) {
-    await hre.tenderlyNetwork.setHead(buidlerevmSnapshotId);
-    return;
-  }
+
   await evmRevert(buidlerevmSnapshotId);
 };
 
