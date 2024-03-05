@@ -42,62 +42,17 @@ export const CommonsConfig: ICommonConfiguration = {
     WETH: {
       borrowRate: oneRay.multipliedBy(0.03).toFixed(),
     },
-    DAI: {
-      borrowRate: oneRay.multipliedBy(0.039).toFixed(),
-    },
-    TUSD: {
-      borrowRate: oneRay.multipliedBy(0.035).toFixed(),
-    },
     USDC: {
       borrowRate: oneRay.multipliedBy(0.039).toFixed(),
-    },
-    SUSD: {
-      borrowRate: oneRay.multipliedBy(0.035).toFixed(),
     },
     USDT: {
       borrowRate: oneRay.multipliedBy(0.035).toFixed(),
     },
-    BAT: {
-      borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    AAVE: {
-      borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    LINK: {
-      borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    KNC: {
-      borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    MKR: {
-      borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    MANA: {
+    WSYS: {
       borrowRate: oneRay.multipliedBy(0.03).toFixed(),
     },
     WBTC: {
       borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    ZRX: {
-      borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    SNX: {
-      borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    YFI: {
-      borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    REN: {
-      borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    UNI: {
-      borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    ENJ: {
-      borrowRate: oneRay.multipliedBy(0.03).toFixed(),
-    },
-    BUSD: {
-      borrowRate: oneRay.multipliedBy(0.05).toFixed(),
     },
   },
   // ----------------
@@ -106,12 +61,12 @@ export const CommonsConfig: ICommonConfiguration = {
 
   // If PoolAdmin/emergencyAdmin is set, will take priority over PoolAdminIndex/emergencyAdminIndex
   PoolAdmin: {
-    [eEthereumNetwork.hardhat]: "0x5B024AfAaaed10bA2788fdDCd7b72Af60A854D2F",
+    [eEthereumNetwork.hardhat]: "",
     [eEthereumNetwork.main]: "0x5B024AfAaaed10bA2788fdDCd7b72Af60A854D2F",
   },
   PoolAdminIndex: 0,
   EmergencyAdmin: {
-    [eEthereumNetwork.hardhat]: "0x5B024AfAaaed10bA2788fdDCd7b72Af60A854D2F",
+    [eEthereumNetwork.hardhat]: "",
     [eEthereumNetwork.main]: "0x5B024AfAaaed10bA2788fdDCd7b72Af60A854D2F",
   },
   EmergencyAdminIndex: 1,
@@ -120,12 +75,12 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.hardhat]: '',
   },
   ProviderRegistryOwner: {
+    [eEthereumNetwork.hardhat]: '',
     [eEthereumNetwork.main]: "0x5B024AfAaaed10bA2788fdDCd7b72Af60A854D2F",
-    [eEthereumNetwork.hardhat]: '0x5B024AfAaaed10bA2788fdDCd7b72Af60A854D2F',
   },
   LendingRateOracle: {
     [eEthereumNetwork.hardhat]: '',
-    [eEthereumNetwork.main]: '', //'',
+    [eEthereumNetwork.main]: '',
   },
   LendingPoolCollateralManager: {
     [eEthereumNetwork.hardhat]: '',
@@ -156,32 +111,22 @@ export const CommonsConfig: ICommonConfiguration = {
     [eEthereumNetwork.main]: ZERO_ADDRESS,
   },
   
-  ChainlinkAggregator: {
-    [eEthereumNetwork.hardhat]: {},
-    [eEthereumNetwork.main]: {
-      AAVE: '0x6Df09E975c830ECae5bd4eD9d90f3A95a4f88012',
-      USDC: '0x986b5E1e1755e3C2440e960477f25201B0a8bbD4',
-      USDT: '0xEe9F2375b4bdF6387aa8265dD4FB8F16512A1d46',
-      WBTC: '0xdeb288F737066589598e9214E782fa5A8eD689e8',
-      WETH: '0x9b26214bEC078E68a394AaEbfbffF406Ce14893F',
-    },
-  },
+  // ChainlinkAggregator: {
+  //   [eEthereumNetwork.hardhat]: {},
+  //   [eEthereumNetwork.main]: {
+  //   },
+  // },
   ReserveAssets: {
     [eEthereumNetwork.hardhat]: {},
     [eEthereumNetwork.main]: {},
   },
   ReservesConfig: {},
   ATokenDomainSeparator: {
-    [eEthereumNetwork.hardhat]:
-      '',
+    [eEthereumNetwork.hardhat]:'',
     [eEthereumNetwork.main]: '',
   },
-  WETH: {
-    [eEthereumNetwork.hardhat]: '', // deployed in local evm
-    [eEthereumNetwork.main]: '0x4200000000000000000000000000000000000006',
-  },
   WrappedNativeToken: {
-    [eEthereumNetwork.hardhat]: '', // deployed in local evm
+    [eEthereumNetwork.hardhat]: '0x4200000000000000000000000000000000000006', // deployed in local evm
     [eEthereumNetwork.main]: '0x4200000000000000000000000000000000000006',
   },
   ReserveFactorTreasuryAddress: {
@@ -190,6 +135,6 @@ export const CommonsConfig: ICommonConfiguration = {
   },
   IncentivesController: {
     [eEthereumNetwork.hardhat]: ZERO_ADDRESS,
-    [eEthereumNetwork.main]: ZERO_ADDRESS,
+    [eEthereumNetwork.main]: '0x4d523e1a7650b37302E613B509bAfc14Fbc236a0',
   },
 };

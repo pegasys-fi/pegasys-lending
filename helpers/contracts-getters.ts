@@ -1,3 +1,4 @@
+import { BigNumberish } from 'ethers';
 import {
   AaveProtocolDataProviderFactory,
   ATokenFactory,
@@ -37,7 +38,13 @@ import {
 import { IERC20DetailedFactory } from '../typechain/IERC20DetailedFactory';
 import { getEthersSigners, MockTokenMap } from './contracts-helpers';
 import { DRE, getDb, notFalsyOrZeroAddress, omit } from './misc-utils';
-import { eContractid, PoolConfiguration, tEthereumAddress, TokenContractId } from './types';
+import {
+  eContractid,
+  eEthereumNetwork,
+  PoolConfiguration,
+  tEthereumAddress,
+  TokenContractId,
+} from './types';
 
 export const getFirstSigner = async () => (await getEthersSigners())[0];
 
@@ -196,6 +203,19 @@ export const getQuoteCurrencies = (oracleQuoteCurrency: string): string[] => {
     default:
       return ['ETH', 'WETH'];
   }
+};
+
+export const getPairTokenIndexes = (network: eEthereumNetwork): [string[], BigNumberish[]] => {
+  const mappedPairs = [
+    '0x2A4DC2e946b92AB4a1f7D62844EB237788F9056c', //btc
+    '0x4200000000000000000000000000000000000006', //wsys
+    '0x28c9c7Fb3fE3104d2116Af26cC8eF7905547349c', //usdt
+    '0x368433cac2a0b8d76e64681a9835502a1f2a8a30', //usdc
+    '0xaA1c53AFd099E415208F47FCFA2C880f659E6904', //eth
+  ];
+  const mappedIndexes = [0, 94, 48, 47, 1];
+
+  return [mappedPairs, mappedIndexes];
 };
 
 export const getPairsTokenAggregator = (

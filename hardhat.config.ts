@@ -14,7 +14,12 @@ import 'solidity-coverage';
 
 const SKIP_LOAD = process.env.SKIP_LOAD === 'true';
 const PRIVATE_KEY =
-	process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001"
+	process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001" as string;
+
+const mainnetFork =  {
+    blockNumber: 11110852,
+    url: `https://rpc.rollux.com`
+  };
 
 
 // Prevent to load scripts before compilation and typechain
@@ -67,6 +72,14 @@ const buidlerConfig = {
       chainId: 570,
       url: "https://rpc.rollux.com",
       accounts: [PRIVATE_KEY]
+    },
+    hardhat: {
+      chainId: 31337,
+      accounts: {
+        privateKey: PRIVATE_KEY,
+        balance: "10000000000000000000000", 
+        },
+      forking: mainnetFork,
     },
   },
 };

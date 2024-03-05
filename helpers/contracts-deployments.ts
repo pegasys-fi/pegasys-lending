@@ -1,4 +1,4 @@
-import { Contract } from 'ethers';
+import { BigNumberish, Contract } from 'ethers';
 import { DRE, notFalsyOrZeroAddress } from './misc-utils';
 import {
   tEthereumAddress,
@@ -278,7 +278,7 @@ export const deployMockAggregator = async (price: tStringTokenSmallUnits, verify
   );
 
 export const deployAaveOracle = async (
-  args: [tEthereumAddress[], tEthereumAddress[], tEthereumAddress, tEthereumAddress, string],
+  args: [tEthereumAddress[], BigNumberish[], tEthereumAddress, tEthereumAddress, tEthereumAddress],
   verify?: boolean
 ) =>
   withSaveAndVerify(

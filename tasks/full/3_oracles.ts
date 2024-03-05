@@ -2,22 +2,21 @@ import { task } from 'hardhat/config';
 import { getParamPerNetwork } from '../../helpers/contracts-helpers';
 import { deployAaveOracle, deployLendingRateOracle } from '../../helpers/contracts-deployments';
 import { setInitialMarketRatesInRatesOracleByHelper } from '../../helpers/oracles-helpers';
-import { ICommonConfiguration, eNetwork, SymbolMap } from '../../helpers/types';
+import { ICommonConfiguration, eEthereumNetwork, SymbolMap } from '../../helpers/types';
 import { waitForTx, notFalsyOrZeroAddress } from '../../helpers/misc-utils';
 import {
   ConfigNames,
   loadPoolConfig,
+  getWethAddress,
   getGenesisPoolAdmin,
   getLendingRateOracles,
-  getQuoteCurrency,
 } from '../../helpers/configuration';
 import {
   getAaveOracle,
   getLendingPoolAddressesProvider,
   getLendingRateOracle,
-  getPairsTokenAggregator,
+  getPairTokenIndexes,
 } from '../../helpers/contracts-getters';
-import { AaveOracle, LendingRateOracle } from '../../typechain';
 
 task('full:deploy-oracles', 'Deploy oracles for dev enviroment')
   .addFlag('verify', 'Verify contracts at Etherscan')
@@ -25,58 +24,52 @@ task('full:deploy-oracles', 'Deploy oracles for dev enviroment')
   .setAction(async ({ verify, pool }, DRE) => {
     try {
       await DRE.run('set-DRE');
-      const network = <eNetwork>DRE.network.name;
+      const network = <eEthereumNetwork>DRE.network.name;
       const poolConfig = loadPoolConfig(pool);
       const {
         ProtocolGlobalParams: { UsdAddress },
         ReserveAssets,
         FallbackOracle,
-        ChainlinkAggregator,
+        // ChainlinkAggregator,
       } = poolConfig as ICommonConfiguration;
       const lendingRateOracles = getLendingRateOracles(poolConfig);
       const addressesProvider = await getLendingPoolAddressesProvider();
       const admin = await getGenesisPoolAdmin(poolConfig);
-      const aaveOracleAddress = getParamPerNetwork(poolConfig.AaveOracle, network);
+      const AaveOracleAddress = getParamPerNetwork(poolConfig.AaveOracle, network);
       const lendingRateOracleAddress = getParamPerNetwork(poolConfig.LendingRateOracle, network);
       const fallbackOracleAddress = await getParamPerNetwork(FallbackOracle, network);
       const reserveAssets = await getParamPerNetwork(ReserveAssets, network);
-      const chainlinkAggregators = await getParamPerNetwork(ChainlinkAggregator, network);
+      // const chainlinkAggregators = await getParamPerNetwork(ChainlinkAggregator, network);
 
       const tokensToWatch: SymbolMap<string> = {
         ...reserveAssets,
         USD: UsdAddress,
       };
-      const [tokens, aggregators] = getPairsTokenAggregator(
-        tokensToWatch,
-        chainlinkAggregators,
-        poolConfig.OracleQuoteCurrency
-      );
+      // const [tokens, aggregators] = getPairsTokenAggregator(tokensToWatch, chainlinkAggregators);
 
-      let aaveOracle: AaveOracle;
-      let lendingRateOracle: LendingRateOracle;
+      const [tokens, indexes] = getPairTokenIndexes(network);
 
-      if (notFalsyOrZeroAddress(aaveOracleAddress)) {
-        aaveOracle = await await getAaveOracle(aaveOracleAddress);
-        await waitForTx(await aaveOracle.setAssetSources(tokens, aggregators));
-      } else {
-        aaveOracle = await deployAaveOracle(
-          [
-            tokens,
-            aggregators,
-            fallbackOracleAddress,
-            await getQuoteCurrency(poolConfig),
-            poolConfig.OracleQuoteUnit,
-          ],
-          verify
-        );
-        await waitForTx(await aaveOracle.setAssetSources(tokens, aggregators));
-      }
+      let oracle = '0xbc0453F6FAC74FB46223EA5CC55Bd82852f0C670';
 
-      if (notFalsyOrZeroAddress(lendingRateOracleAddress)) {
-        lendingRateOracle = await getLendingRateOracle(lendingRateOracleAddress);
-      } else {
-        lendingRateOracle = await deployLendingRateOracle(verify);
-        const { USD, ...tokensAddressesWithoutUsd } = tokensToWatch;
+      const AaveOracle = notFalsyOrZeroAddress(AaveOracleAddress)
+        ? await getAaveOracle(AaveOracleAddress)
+        : await deployAaveOracle(
+            [
+              tokens,
+              indexes,
+              '0x4200000000000000000000000000000000000006',
+              fallbackOracleAddress,
+              oracle,
+            ],
+            verify
+          );
+
+      const lendingRateOracle = notFalsyOrZeroAddress(lendingRateOracleAddress)
+        ? await getLendingRateOracle(lendingRateOracleAddress)
+        : await deployLendingRateOracle(verify);
+      const { USD, ...tokensAddressesWithoutUsd } = tokensToWatch;
+
+      if (!lendingRateOracleAddress) {
         await setInitialMarketRatesInRatesOracleByHelper(
           lendingRateOracles,
           tokensAddressesWithoutUsd,
@@ -85,19 +78,10 @@ task('full:deploy-oracles', 'Deploy oracles for dev enviroment')
         );
       }
 
-      console.log('Aave Oracle: %s', aaveOracle.address);
-      console.log('Lending Rate Oracle: %s', lendingRateOracle.address);
-
       // Register the proxy price provider on the addressesProvider
-      await waitForTx(await addressesProvider.setPriceOracle(aaveOracle.address));
+      await waitForTx(await addressesProvider.setPriceOracle(AaveOracle.address));
       await waitForTx(await addressesProvider.setLendingRateOracle(lendingRateOracle.address));
     } catch (error) {
-      if (DRE.network.name.includes('tenderly')) {
-        const transactionLink = `https://dashboard.tenderly.co/${DRE.config.tenderly.username}/${
-          DRE.config.tenderly.project
-        }/fork/${DRE.tenderly.network().getFork()}/simulation/${DRE.tenderly.network().getHead()}`;
-        console.error('Check tx error:', transactionLink);
-      }
       throw error;
     }
   });

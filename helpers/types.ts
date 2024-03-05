@@ -189,13 +189,8 @@ export interface iAssetBase<T> {
   WETH: T;
   USDC: T;
   USDT: T;
-  AAVE: T;
+  WSYS: T;
   WBTC: T;
-  USD: T;
-  UniWBTCWETH: T;
-  UniAAVEWETH: T;
-  UniUSDCWETH: T;
-  UniWBTCUSDC: T;
 }
 
 export type iAssetsWithoutETH<T> = Omit<iAssetBase<T>, 'ETH'>;
@@ -204,12 +199,12 @@ export type iAssetsWithoutUSD<T> = Omit<iAssetBase<T>, 'USD'>;
 
 export type iAavePoolAssets<T> = Pick<
   iAssetsWithoutUSD<T>,
-  'USDC' | 'USDT' | 'AAVE' | 'WBTC' | 'WETH'
+  'WETH' | 'USDC' | 'USDT' | 'WSYS' | 'WBTC'
 >;
 
 export type iLpPoolAssets<T> = Pick<
   iAssetsWithoutUSD<T>,
-  'USDC' | 'USDT' | 'WBTC' | 'WETH' | 'UniWBTCWETH' | 'UniAAVEWETH' | 'UniUSDCWETH' | 'UniWBTCUSDC'
+  'WETH' | 'USDC' | 'USDT' | 'WSYS' | 'WBTC'
 >;
 
 export type iMultiPoolsAssets<T> = iAssetCommon<T> | iAavePoolAssets<T>;
@@ -219,16 +214,12 @@ export type iAavePoolTokens<T> = Omit<iAavePoolAssets<T>, 'ETH'>;
 export type iAssetAggregatorBase<T> = iAssetsWithoutETH<T>;
 
 export enum TokenContractId {
-  AAVE = 'AAVE',
+  WSYS = 'WSYS',
   WETH = 'WETH',
   USDC = 'USDC',
   USDT = 'USDT',
   WBTC = 'WBTC',
   USD = 'USD',
-  UniWBTCWETH = 'UniWBTCWETH',
-  UniAAVEWETH = 'UniAAVEWETH',
-  UniUSDCWETH = 'UniUSDCWETH',
-  UniWBTCUSDC = 'UniWBTCUSDC',
 }
 
 export interface IReserveParams extends IReserveBorrowParams, IReserveCollateralParams {
