@@ -14,7 +14,7 @@ const okErrors = [`Contract source code already verified`, 'Already Verified'];
 
 const unableVerifyError = 'Fail - Unable to verify';
 
-export const SUPPORTED_ETHERSCAN_NETWORKS = ['main'];
+export const SUPPORTED_SYSERSCAN_NETWORKS = ['main'];
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -27,15 +27,15 @@ export const verifyEtherscanContract = async (
 ) => {
   const currentNetwork = DRE.network.name;
 
-  if (!SUPPORTED_ETHERSCAN_NETWORKS.includes(currentNetwork)) {
+  if (!SUPPORTED_SYSERSCAN_NETWORKS.includes(currentNetwork)) {
     throw Error(
-      `Current network ${currentNetwork} not supported. Please change to one of the next networks: ${SUPPORTED_ETHERSCAN_NETWORKS.toString()}`
+      `Current network ${currentNetwork} not supported. Please change to one of the next networks: ${SUPPORTED_SYSERSCAN_NETWORKS.toString()}`
     );
   }
 
   try {
     console.log(
-      '[ETHERSCAN][WARNING] Delaying Etherscan verification due their API can not find newly deployed contracts'
+      '[SYSERSCAN][WARNING] Delaying Etherscan verification due their API can not find newly deployed contracts'
     );
     const msDelay = 3000;
     const times = 4;
@@ -71,36 +71,36 @@ export const runTaskWithRetry = async (
       await DRE.run(task, params);
       cleanup();
     } else if (times === 1) {
-      console.log('[ETHERSCAN][WARNING] Trying to verify via uploading all sources.');
+      console.log('[SYSERSCAN][WARNING] Trying to verify via uploading all sources.');
       delete params.relatedSources;
       await DRE.run(task, params);
       cleanup();
     } else {
       cleanup();
       console.error(
-        '[ETHERSCAN][ERROR] Errors after all the retries, check the logs for more information.'
+        '[SYSERSCAN][ERROR] Errors after all the retries, check the logs for more information.'
       );
     }
   } catch (error) {
     counter--;
 
     if (okErrors.some((okReason) => error.message.includes(okReason))) {
-      console.info('[ETHERSCAN][INFO] Skipping due OK response: ', error.message);
+      console.info('[SYSERSCAN][INFO] Skipping due OK response: ', error.message);
       return;
     }
 
     if (fatalErrors.some((fatalError) => error.message.includes(fatalError))) {
       console.error(
-        '[ETHERSCAN][ERROR] Fatal error detected, skip retries and resume deployment.',
+        '[SYSERSCAN][ERROR] Fatal error detected, skip retries and resume deployment.',
         error.message
       );
       return;
     }
-    console.error('[ETHERSCAN][ERROR]', error.message);
+    console.error('[SYSERSCAN][ERROR]', error.message);
     console.log();
-    console.info(`[ETHERSCAN][[INFO] Retrying attemps: ${counter}.`);
+    console.info(`[SYSERSCAN][[INFO] Retrying attemps: ${counter}.`);
     if (error.message.includes(unableVerifyError)) {
-      console.log('[ETHERSCAN][WARNING] Trying to verify via uploading all sources.');
+      console.log('[SYSERSCAN][WARNING] Trying to verify via uploading all sources.');
       delete params.relatedSources;
     }
     await runTaskWithRetry(task, params, counter, msDelay, cleanup);
@@ -110,9 +110,9 @@ export const runTaskWithRetry = async (
 export const checkVerification = () => {
   const currentNetwork = DRE.network.name;
 
-  if (!SUPPORTED_ETHERSCAN_NETWORKS.includes(currentNetwork)) {
+  if (!SUPPORTED_SYSERSCAN_NETWORKS.includes(currentNetwork)) {
     console.error(
-      `Current network ${currentNetwork} not supported. Please change to one of the next networks: ${SUPPORTED_ETHERSCAN_NETWORKS.toString()}`
+      `Current network ${currentNetwork} not supported. Please change to one of the next networks: ${SUPPORTED_SYSERSCAN_NETWORKS.toString()}`
     );
     exit(5);
   }

@@ -101,7 +101,7 @@ export const setAssetPricesInOracle = async (
 export const deployMockAggregators = async (initialPrices: SymbolMap<string>, verify?: boolean) => {
   const aggregators: { [tokenSymbol: string]: MockAggregator } = {};
   for (const tokenContractName of Object.keys(initialPrices)) {
-    if (tokenContractName !== 'ETH') {
+    if (tokenContractName !== 'SYS') {
       const priceIndex = Object.keys(initialPrices).findIndex(
         (value) => value === tokenContractName
       );
@@ -118,7 +118,7 @@ export const deployAllMockAggregators = async (
 ) => {
   const aggregators: { [tokenSymbol: string]: tEthereumAddress } = {};
   for (const tokenContractName of Object.keys(initialPrices)) {
-    if (tokenContractName !== 'ETH') {
+    if (tokenContractName !== 'SYS') {
       const priceIndex = Object.keys(initialPrices).findIndex(
         (value) => value === tokenContractName
       );

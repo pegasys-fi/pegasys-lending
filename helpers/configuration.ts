@@ -1,5 +1,5 @@
 import {
-  AavePools,
+  PegasysPools,
   iMultiPoolsAssets,
   IReserveParams,
   PoolConfiguration,
@@ -7,27 +7,23 @@ import {
   IBaseConfiguration,
 } from './types';
 import { getEthersSignersAddresses, getParamPerPool } from './contracts-helpers';
-import AaveConfig from '../markets/aave';
-import AmmConfig from '../markets/amm';
+import PegasysConfig from '../markets/pegasys';
 
-import { CommonsConfig } from '../markets/aave/commons';
+import { CommonsConfig } from '../markets/pegasys/commons';
 import { DRE, filterMapBy } from './misc-utils';
 import { tEthereumAddress } from './types';
 import { getParamPerNetwork } from './contracts-helpers';
-import { deployWETHMocked } from './contracts-deployments';
+import { deployWSYSMocked } from './contracts-deployments';
 
 export enum ConfigNames {
   Commons = 'Commons',
-  Aave = 'Aave',
-  Amm = 'Amm',
+  Pegasys = 'Pegasys',
 }
 
 export const loadPoolConfig = (configName: ConfigNames): PoolConfiguration => {
   switch (configName) {
-    case ConfigNames.Aave:
-      return AaveConfig;
-    case ConfigNames.Amm:
-      return AmmConfig;
+    case ConfigNames.Pegasys:
+      return PegasysConfig;
     case ConfigNames.Commons:
       return CommonsConfig;
     default:
@@ -43,14 +39,11 @@ export const loadPoolConfig = (configName: ConfigNames): PoolConfiguration => {
 // PROTOCOL PARAMS PER POOL
 // ----------------
 
-export const getReservesConfigByPool = (pool: AavePools): iMultiPoolsAssets<IReserveParams> =>
+export const getReservesConfigByPool = (pool: PegasysPools): iMultiPoolsAssets<IReserveParams> =>
   getParamPerPool<iMultiPoolsAssets<IReserveParams>>(
     {
-      [AavePools.proto]: {
-        ...AaveConfig.ReservesConfig,
-      },
-      [AavePools.amm]: {
-        ...AmmConfig.ReservesConfig,
+      [PegasysPools.proto]: {
+        ...PegasysConfig.ReservesConfig,
       },
     },
     pool
@@ -90,30 +83,30 @@ export const getATokenDomainSeparatorPerNetwork = (
   config: IBaseConfiguration
 ): tEthereumAddress => getParamPerNetwork<tEthereumAddress>(config.ATokenDomainSeparator, network);
 
-export const getWethAddress = async (config: IBaseConfiguration) => {
+export const getWsysAddress = async (config: IBaseConfiguration) => {
   const currentNetwork = process.env.FORK ? process.env.FORK : DRE.network.name;
-  const wethAddress = getParamPerNetwork(config.WETH, <eNetwork>currentNetwork);
-  if (wethAddress) {
-    return wethAddress;
+  const wsysAddress = getParamPerNetwork(config.WSYS, <eNetwork>currentNetwork);
+  if (wsysAddress) {
+    return wsysAddress;
   }
   if (currentNetwork.includes('main')) {
-    throw new Error('WETH not set at mainnet configuration.');
+    throw new Error('WSYS not set at mainnet configuration.');
   }
-  const weth = await deployWETHMocked();
-  return weth.address;
+  const wsys = await deployWSYSMocked();
+  return wsys.address;
 };
 
 export const getWrappedNativeTokenAddress = async (config: IBaseConfiguration) => {
   const currentNetwork = process.env.MAINNET_FORK === 'true' ? 'main' : DRE.network.name;
-  const wethAddress = getParamPerNetwork(config.WrappedNativeToken, <eNetwork>currentNetwork);
-  if (wethAddress) {
-    return wethAddress;
+  const wsysAddress = getParamPerNetwork(config.WrappedNativeToken, <eNetwork>currentNetwork);
+  if (wsysAddress) {
+    return wsysAddress;
   }
   if (currentNetwork.includes('main')) {
-    throw new Error('WETH not set at mainnet configuration.');
+    throw new Error('WSYS not set at mainnet configuration.');
   }
-  const weth = await deployWETHMocked();
-  return weth.address;
+  const wsys = await deployWSYSMocked();
+  return wsys.address;
 };
 
 export const getLendingRateOracles = (poolConfig: IBaseConfiguration) => {
@@ -131,9 +124,9 @@ export const getLendingRateOracles = (poolConfig: IBaseConfiguration) => {
 
 export const getQuoteCurrency = async (config: IBaseConfiguration) => {
   switch (config.OracleQuoteCurrency) {
-    case 'ETH':
-    case 'WETH':
-      return getWethAddress(config);
+    case 'SYS':
+    case 'WSYS':
+      return getWsysAddress(config);
     case 'USD':
       return config.ProtocolGlobalParams.UsdAddress;
     default:

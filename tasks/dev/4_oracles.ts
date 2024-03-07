@@ -1,5 +1,5 @@
 import { task } from 'hardhat/config';
-import { deployAaveOracle, deployLendingRateOracle } from '../../helpers/contracts-deployments';
+import { deployPegasysOracle, deployLendingRateOracle } from '../../helpers/contracts-deployments';
 import {
   setInitialAssetPricesInOracle,
   deployAllMockAggregators,
@@ -46,7 +46,7 @@ task('dev:deploy-oracles', 'Deploy oracles for dev environment')
     const admin = await addressesProvider.getPoolAdmin();
 
     const fallbackOracle = await getPriceOracle('0x0F9d5ED72f6691E47abe2f79B890C3C33e924092');
-    await waitForTx(await fallbackOracle.setEthUsdPrice(MockUsdPriceInWei));
+    await waitForTx(await fallbackOracle.setSysUsdPrice(MockUsdPriceInWei));
     await setInitialAssetPricesInOracle(AllAssetsInitialPrices, mockTokensAddress, fallbackOracle);
 
     const mockAggregators = await deployAllMockAggregators(AllAssetsInitialPrices, verify);
@@ -59,7 +59,7 @@ task('dev:deploy-oracles', 'Deploy oracles for dev environment')
       OracleQuoteCurrency
     );
 
-    const aaveOracle = await deployAaveOracle(
+    const pegasysOracle = await deployPegasysOracle(
       [
         tokens,
         aggregators,
@@ -85,6 +85,6 @@ task('dev:deploy-oracles', 'Deploy oracles for dev environment')
       admin
     );
     // Register the proxy price provider on the addressesProvider
-    await waitForTx(await addressesProvider.setPriceOracle(aaveOracle.address));
+    await waitForTx(await addressesProvider.setPriceOracle(pegasysOracle.address));
     await waitForTx(await addressesProvider.setLendingRateOracle(lendingRateOracle.address));
   });

@@ -14,7 +14,7 @@ import {DataTypes} from '../types/DataTypes.sol';
 
 /**
  * @title GenericLogic library
- * @author Aave
+ * @author Aave and Pegasys
  * @title Implements protocol-level logic to calculate and validate the state of a user
  */
 library GenericLogic {
@@ -30,10 +30,10 @@ library GenericLogic {
   struct balanceDecreaseAllowedLocalVars {
     uint256 decimals;
     uint256 liquidationThreshold;
-    uint256 totalCollateralInETH;
-    uint256 totalDebtInETH;
+    uint256 totalCollateralInSYS;
+    uint256 totalDebtInSYS;
     uint256 avgLiquidationThreshold;
-    uint256 amountToDecreaseInETH;
+    uint256 amountToDecreaseInSYS;
     uint256 collateralBalanceAfterDecrease;
     uint256 liquidationThresholdAfterDecrease;
     uint256 healthFactorAfterDecrease;
@@ -77,22 +77,22 @@ library GenericLogic {
     }
 
     (
-      vars.totalCollateralInETH,
-      vars.totalDebtInETH,
+      vars.totalCollateralInSYS,
+      vars.totalDebtInSYS,
       ,
       vars.avgLiquidationThreshold,
 
     ) = calculateUserAccountData(user, reservesData, userConfig, reserves, reservesCount, oracle);
 
-    if (vars.totalDebtInETH == 0) {
+    if (vars.totalDebtInSYS == 0) {
       return true;
     }
 
-    vars.amountToDecreaseInETH = IPriceOracleGetter(oracle).getAssetPrice(asset).mul(amount).div(
-      10**vars.decimals
+    vars.amountToDecreaseInSYS = IPriceOracleGetter(oracle).getAssetPrice(asset).mul(amount).div(
+      10 ** vars.decimals
     );
 
-    vars.collateralBalanceAfterDecrease = vars.totalCollateralInETH.sub(vars.amountToDecreaseInETH);
+    vars.collateralBalanceAfterDecrease = vars.totalCollateralInSYS.sub(vars.amountToDecreaseInSYS);
 
     //if there is a borrow, there can't be 0 collateral
     if (vars.collateralBalanceAfterDecrease == 0) {
@@ -100,17 +100,16 @@ library GenericLogic {
     }
 
     vars.liquidationThresholdAfterDecrease = vars
-      .totalCollateralInETH
+      .totalCollateralInSYS
       .mul(vars.avgLiquidationThreshold)
-      .sub(vars.amountToDecreaseInETH.mul(vars.liquidationThreshold))
+      .sub(vars.amountToDecreaseInSYS.mul(vars.liquidationThreshold))
       .div(vars.collateralBalanceAfterDecrease);
 
-    uint256 healthFactorAfterDecrease =
-      calculateHealthFactorFromBalances(
-        vars.collateralBalanceAfterDecrease,
-        vars.totalDebtInETH,
-        vars.liquidationThresholdAfterDecrease
-      );
+    uint256 healthFactorAfterDecrease = calculateHealthFactorFromBalances(
+      vars.collateralBalanceAfterDecrease,
+      vars.totalDebtInSYS,
+      vars.liquidationThresholdAfterDecrease
+    );
 
     return healthFactorAfterDecrease >= GenericLogic.HEALTH_FACTOR_LIQUIDATION_THRESHOLD;
   }
@@ -125,8 +124,8 @@ library GenericLogic {
     uint256 liquidationThreshold;
     uint256 i;
     uint256 healthFactor;
-    uint256 totalCollateralInETH;
-    uint256 totalDebtInETH;
+    uint256 totalCollateralInSYS;
+    uint256 totalDebtInSYS;
     uint256 avgLtv;
     uint256 avgLiquidationThreshold;
     uint256 reservesLength;
@@ -138,14 +137,14 @@ library GenericLogic {
 
   /**
    * @dev Calculates the user data across the reserves.
-   * this includes the total liquidity/collateral/borrow balances in ETH,
+   * this includes the total liquidity/collateral/borrow balances in SYS,
    * the average Loan To Value, the average Liquidation Ratio, and the Health factor.
    * @param user The address of the user
    * @param reservesData Data of all the reserves
    * @param userConfig The configuration of the user
    * @param reserves The list of the available reserves
    * @param oracle The price oracle address
-   * @return The total collateral and total debt of the user in ETH, the avg ltv, liquidation threshold and the HF
+   * @return The total collateral and total debt of the user in SYS, the avg ltv, liquidation threshold and the HF
    **/
   function calculateUserAccountData(
     address user,
@@ -154,17 +153,7 @@ library GenericLogic {
     mapping(uint256 => address) storage reserves,
     uint256 reservesCount,
     address oracle
-  )
-    internal
-    view
-    returns (
-      uint256,
-      uint256,
-      uint256,
-      uint256,
-      uint256
-    )
-  {
+  ) internal view returns (uint256, uint256, uint256, uint256, uint256) {
     CalculateUserAccountDataVars memory vars;
 
     if (userConfig.isEmpty()) {
@@ -182,20 +171,22 @@ library GenericLogic {
         .configuration
         .getParams();
 
-      vars.tokenUnit = 10**vars.decimals;
+      vars.tokenUnit = 10 ** vars.decimals;
       vars.reserveUnitPrice = IPriceOracleGetter(oracle).getAssetPrice(vars.currentReserveAddress);
 
       if (vars.liquidationThreshold != 0 && userConfig.isUsingAsCollateral(vars.i)) {
         vars.compoundedLiquidityBalance = IERC20(currentReserve.aTokenAddress).balanceOf(user);
 
-        uint256 liquidityBalanceETH =
-          vars.reserveUnitPrice.mul(vars.compoundedLiquidityBalance).div(vars.tokenUnit);
+        uint256 liquidityBalanceSYS = vars
+          .reserveUnitPrice
+          .mul(vars.compoundedLiquidityBalance)
+          .div(vars.tokenUnit);
 
-        vars.totalCollateralInETH = vars.totalCollateralInETH.add(liquidityBalanceETH);
+        vars.totalCollateralInSYS = vars.totalCollateralInSYS.add(liquidityBalanceSYS);
 
-        vars.avgLtv = vars.avgLtv.add(liquidityBalanceETH.mul(vars.ltv));
+        vars.avgLtv = vars.avgLtv.add(liquidityBalanceSYS.mul(vars.ltv));
         vars.avgLiquidationThreshold = vars.avgLiquidationThreshold.add(
-          liquidityBalanceETH.mul(vars.liquidationThreshold)
+          liquidityBalanceSYS.mul(vars.liquidationThreshold)
         );
       }
 
@@ -207,25 +198,25 @@ library GenericLogic {
           IERC20(currentReserve.variableDebtTokenAddress).balanceOf(user)
         );
 
-        vars.totalDebtInETH = vars.totalDebtInETH.add(
+        vars.totalDebtInSYS = vars.totalDebtInSYS.add(
           vars.reserveUnitPrice.mul(vars.compoundedBorrowBalance).div(vars.tokenUnit)
         );
       }
     }
 
-    vars.avgLtv = vars.totalCollateralInETH > 0 ? vars.avgLtv.div(vars.totalCollateralInETH) : 0;
-    vars.avgLiquidationThreshold = vars.totalCollateralInETH > 0
-      ? vars.avgLiquidationThreshold.div(vars.totalCollateralInETH)
+    vars.avgLtv = vars.totalCollateralInSYS > 0 ? vars.avgLtv.div(vars.totalCollateralInSYS) : 0;
+    vars.avgLiquidationThreshold = vars.totalCollateralInSYS > 0
+      ? vars.avgLiquidationThreshold.div(vars.totalCollateralInSYS)
       : 0;
 
     vars.healthFactor = calculateHealthFactorFromBalances(
-      vars.totalCollateralInETH,
-      vars.totalDebtInETH,
+      vars.totalCollateralInSYS,
+      vars.totalDebtInSYS,
       vars.avgLiquidationThreshold
     );
     return (
-      vars.totalCollateralInETH,
-      vars.totalDebtInETH,
+      vars.totalCollateralInSYS,
+      vars.totalDebtInSYS,
       vars.avgLtv,
       vars.avgLiquidationThreshold,
       vars.healthFactor
@@ -234,42 +225,42 @@ library GenericLogic {
 
   /**
    * @dev Calculates the health factor from the corresponding balances
-   * @param totalCollateralInETH The total collateral in ETH
-   * @param totalDebtInETH The total debt in ETH
+   * @param totalCollateralInSYS The total collateral in SYS
+   * @param totalDebtInSYS The total debt in SYS
    * @param liquidationThreshold The avg liquidation threshold
    * @return The health factor calculated from the balances provided
    **/
   function calculateHealthFactorFromBalances(
-    uint256 totalCollateralInETH,
-    uint256 totalDebtInETH,
+    uint256 totalCollateralInSYS,
+    uint256 totalDebtInSYS,
     uint256 liquidationThreshold
   ) internal pure returns (uint256) {
-    if (totalDebtInETH == 0) return uint256(-1);
+    if (totalDebtInSYS == 0) return uint256(-1);
 
-    return (totalCollateralInETH.percentMul(liquidationThreshold)).wadDiv(totalDebtInETH);
+    return (totalCollateralInSYS.percentMul(liquidationThreshold)).wadDiv(totalDebtInSYS);
   }
 
   /**
-   * @dev Calculates the equivalent amount in ETH that an user can borrow, depending on the available collateral and the
+   * @dev Calculates the equivalent amount in SYS that an user can borrow, depending on the available collateral and the
    * average Loan To Value
-   * @param totalCollateralInETH The total collateral in ETH
-   * @param totalDebtInETH The total borrow balance
+   * @param totalCollateralInSYS The total collateral in SYS
+   * @param totalDebtInSYS The total borrow balance
    * @param ltv The average loan to value
-   * @return the amount available to borrow in ETH for the user
+   * @return the amount available to borrow in SYS for the user
    **/
 
-  function calculateAvailableBorrowsETH(
-    uint256 totalCollateralInETH,
-    uint256 totalDebtInETH,
+  function calculateAvailableBorrowsSYS(
+    uint256 totalCollateralInSYS,
+    uint256 totalDebtInSYS,
     uint256 ltv
   ) internal pure returns (uint256) {
-    uint256 availableBorrowsETH = totalCollateralInETH.percentMul(ltv);
+    uint256 availableBorrowsSYS = totalCollateralInSYS.percentMul(ltv);
 
-    if (availableBorrowsETH < totalDebtInETH) {
+    if (availableBorrowsSYS < totalDebtInSYS) {
       return 0;
     }
 
-    availableBorrowsETH = availableBorrowsETH.sub(totalDebtInETH);
-    return availableBorrowsETH;
+    availableBorrowsSYS = availableBorrowsSYS.sub(totalDebtInSYS);
+    return availableBorrowsSYS;
   }
 }

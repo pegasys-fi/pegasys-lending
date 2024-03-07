@@ -1,9 +1,9 @@
 import { BigNumberish } from 'ethers';
 import {
-  AaveProtocolDataProviderFactory,
+  PegasysProtocolDataProviderFactory,
   ATokenFactory,
   ATokensAndRatesHelperFactory,
-  AaveOracleFactory,
+  PegasysOracleFactory,
   DefaultReserveInterestRateStrategyFactory,
   GenericLogicFactory,
   InitializableAdminUpgradeabilityProxyFactory,
@@ -31,8 +31,8 @@ import {
   UniswapRepayAdapterFactory,
   VariableDebtTokenFactory,
   WalletBalanceProviderFactory,
-  WETH9MockedFactory,
-  WETHGatewayFactory,
+  WSYSMockedFactory,
+  WSYSGatewayFactory,
   FlashLiquidationAdapterFactory,
 } from '../typechain';
 import { IERC20DetailedFactory } from '../typechain/IERC20DetailedFactory';
@@ -127,11 +127,11 @@ export const getIErc20Detailed = async (address: tEthereumAddress) =>
     await getFirstSigner()
   );
 
-export const getAaveProtocolDataProvider = async (address?: tEthereumAddress) =>
-  await AaveProtocolDataProviderFactory.connect(
+export const getPegasysProtocolDataProvider = async (address?: tEthereumAddress) =>
+  await PegasysProtocolDataProviderFactory.connect(
     address ||
       (
-        await getDb().get(`${eContractid.AaveProtocolDataProvider}.${DRE.network.name}`).value()
+        await getDb().get(`${eContractid.PegasysProtocolDataProvider}.${DRE.network.name}`).value()
       ).address,
     await getFirstSigner()
   );
@@ -198,10 +198,10 @@ export const getQuoteCurrencies = (oracleQuoteCurrency: string): string[] => {
   switch (oracleQuoteCurrency) {
     case 'USD':
       return ['USD'];
-    case 'ETH':
-    case 'WETH':
+    case 'SYS':
+    case 'WSYS':
     default:
-      return ['ETH', 'WETH'];
+      return ['SYS', 'WSYS'];
   }
 };
 
@@ -302,18 +302,18 @@ export const getATokensAndRatesHelper = async (address?: tEthereumAddress) =>
     await getFirstSigner()
   );
 
-export const getWETHGateway = async (address?: tEthereumAddress) =>
-  await WETHGatewayFactory.connect(
+export const getWSYSGateway = async (address?: tEthereumAddress) =>
+  await WSYSGatewayFactory.connect(
     address ||
       (
-        await getDb().get(`${eContractid.WETHGateway}.${DRE.network.name}`).value()
+        await getDb().get(`${eContractid.WSYSGateway}.${DRE.network.name}`).value()
       ).address,
     await getFirstSigner()
   );
 
-export const getWETHMocked = async (address?: tEthereumAddress) =>
-  await WETH9MockedFactory.connect(
-    address || (await getDb().get(`${eContractid.WETHMocked}.${DRE.network.name}`).value()).address,
+export const getWSYSMocked = async (address?: tEthereumAddress) =>
+  await WSYSMockedFactory.connect(
+    address || (await getDb().get(`${eContractid.WSYSMocked}.${DRE.network.name}`).value()).address,
     await getFirstSigner()
   );
 
@@ -403,9 +403,12 @@ export const getLendingPoolCollateralManager = async (address?: tEthereumAddress
 export const getAddressById = async (id: string): Promise<tEthereumAddress | undefined> =>
   (await getDb().get(`${id}.${DRE.network.name}`).value())?.address || undefined;
 
-export const getAaveOracle = async (address?: tEthereumAddress) =>
-  await AaveOracleFactory.connect(
-    address || (await getDb().get(`${eContractid.AaveOracle}.${DRE.network.name}`).value()).address,
+export const getPegasysOracle = async (address?: tEthereumAddress) =>
+  await PegasysOracleFactory.connect(
+    address ||
+      (
+        await getDb().get(`${eContractid.PegasysOracle}.${DRE.network.name}`).value()
+      ).address,
     await getFirstSigner()
   );
 

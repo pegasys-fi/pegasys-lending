@@ -8,7 +8,7 @@ import {
   eContractid,
   tStringTokenSmallUnits,
   eEthereumNetwork,
-  AavePools,
+  PegasysPools,
   iParamsPerNetwork,
   iParamsPerPool,
   eNetwork,
@@ -158,11 +158,11 @@ export const getOptionalParamAddressPerNetwork = (
   return getParamPerNetwork(param, network);
 };
 
-export const getParamPerPool = <T>({ proto, amm }: iParamsPerPool<T>, pool: AavePools) => {
+export const getParamPerPool = <T>({ proto, amm }: iParamsPerPool<T>, pool: PegasysPools) => {
   switch (pool) {
-    case AavePools.proto:
+    case PegasysPools.proto:
       return proto;
-    case AavePools.amm:
+    case PegasysPools.amm:
       return amm;
     default:
       return proto;
@@ -245,7 +245,7 @@ export const buildLiquiditySwapParams = (
   v: BigNumberish[],
   r: (string | Buffer)[],
   s: (string | Buffer)[],
-  useEthPath: boolean[]
+  useSysPath: boolean[]
 ) => {
   return ethers.utils.defaultAbiCoder.encode(
     [
@@ -268,7 +268,7 @@ export const buildLiquiditySwapParams = (
       v,
       r,
       s,
-      useEthPath,
+      useSysPath,
     ]
   );
 };
@@ -282,11 +282,11 @@ export const buildRepayAdapterParams = (
   v: BigNumberish,
   r: string | Buffer,
   s: string | Buffer,
-  useEthPath: boolean
+  useSysPath: boolean
 ) => {
   return ethers.utils.defaultAbiCoder.encode(
     ['address', 'uint256', 'uint256', 'uint256', 'uint256', 'uint8', 'bytes32', 'bytes32', 'bool'],
-    [collateralAsset, collateralAmount, rateMode, permitAmount, deadline, v, r, s, useEthPath]
+    [collateralAsset, collateralAmount, rateMode, permitAmount, deadline, v, r, s, useSysPath]
   );
 };
 
@@ -295,11 +295,11 @@ export const buildFlashLiquidationAdapterParams = (
   debtAsset: tEthereumAddress,
   user: tEthereumAddress,
   debtToCover: BigNumberish,
-  useEthPath: boolean
+  useSysPath: boolean
 ) => {
   return ethers.utils.defaultAbiCoder.encode(
     ['address', 'address', 'address', 'uint256', 'bool'],
-    [collateralAsset, debtAsset, user, debtToCover, useEthPath]
+    [collateralAsset, debtAsset, user, debtToCover, useSysPath]
   );
 };
 

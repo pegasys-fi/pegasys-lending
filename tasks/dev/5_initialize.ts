@@ -3,8 +3,8 @@ import {
   deployLendingPoolCollateralManager,
   deployMockFlashLoanReceiver,
   deployWalletBalancerProvider,
-  deployAaveProtocolDataProvider,
-  authorizeWETHGateway,
+  deployPegasysProtocolDataProvider,
+  authorizeWSYSGateway,
 } from '../../helpers/contracts-deployments';
 import { getParamPerNetwork } from '../../helpers/contracts-helpers';
 import { eNetwork } from '../../helpers/types';
@@ -15,7 +15,7 @@ import {
   loadPoolConfig,
 } from '../../helpers/configuration';
 
-import { tEthereumAddress, AavePools, eContractid } from '../../helpers/types';
+import { tEthereumAddress, PegasysPools, eContractid } from '../../helpers/types';
 import { waitForTx, filterMapBy, notFalsyOrZeroAddress } from '../../helpers/misc-utils';
 import { configureReservesByHelper, initReservesByHelper } from '../../helpers/init-helpers';
 import { getAllTokenAddresses } from '../../helpers/mock-helpers';
@@ -24,7 +24,7 @@ import {
   getAllMockedTokens,
   getLendingPoolAddressesProvider,
   getLendingPoolConfiguratorProxy,
-  getWETHGateway,
+  getWSYSGateway,
 } from '../../helpers/contracts-getters';
 import { insertContractAddressInDb } from '../../helpers/contracts-helpers';
 
@@ -40,7 +40,7 @@ task('dev:initialize-lending-pool', 'Initialize lending pool configuration.')
       StableDebtTokenNamePrefix,
       VariableDebtTokenNamePrefix,
       SymbolPrefix,
-      WethGateway,
+      WsysGateway,
       ReservesConfig,
     } = poolConfig;
     const mockTokens = await getAllMockedTokens();
@@ -52,8 +52,8 @@ task('dev:initialize-lending-pool', 'Initialize lending pool configuration.')
       filterMapBy(allTokenAddresses, (key: string) => !key.includes('UNI_'))
     );
 
-    const testHelpers = await deployAaveProtocolDataProvider(addressesProvider.address, verify);
-    await insertContractAddressInDb(eContractid.AaveProtocolDataProvider, testHelpers.address);
+    const testHelpers = await deployPegasysProtocolDataProvider(addressesProvider.address, verify);
+    await insertContractAddressInDb(eContractid.PegasysProtocolDataProvider, testHelpers.address);
 
     const admin = await addressesProvider.getPoolAdmin();
 
@@ -92,11 +92,11 @@ task('dev:initialize-lending-pool', 'Initialize lending pool configuration.')
 
     const lendingPoolAddress = await addressesProvider.getLendingPool();
 
-    let gateway = getParamPerNetwork(WethGateway, network);
+    let gateway = getParamPerNetwork(WsysGateway, network);
     if (!notFalsyOrZeroAddress(gateway)) {
-      gateway = (await getWETHGateway()).address;
+      gateway = (await getWSYSGateway()).address;
     }
-    await authorizeWETHGateway(gateway, lendingPoolAddress);
+    await authorizeWSYSGateway(gateway, lendingPoolAddress);
 
     const poolConfigurator = await getLendingPoolConfiguratorProxy();
     await waitForTx(await poolConfigurator.setPoolPause(false));

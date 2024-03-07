@@ -15,7 +15,7 @@ import {ReserveConfiguration} from '../protocol/libraries/configuration/ReserveC
 /**
  * @title UniswapLiquiditySwapAdapter
  * @notice Uniswap V2 Adapter to swap liquidity.
- * @author Aave
+ * @author Aave and Pegasys
  **/
 contract FlashLiquidationAdapter is BaseUniswapAdapter {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
@@ -26,7 +26,7 @@ contract FlashLiquidationAdapter is BaseUniswapAdapter {
     address borrowedAsset;
     address user;
     uint256 debtToCover;
-    bool useEthPath;
+    bool useSysPath;
   }
 
   struct LiquidationCallLocalVars {
@@ -43,8 +43,8 @@ contract FlashLiquidationAdapter is BaseUniswapAdapter {
   constructor(
     ILendingPoolAddressesProvider addressesProvider,
     IUniswapV2Router02 uniswapRouter,
-    address wethAddress
-  ) public BaseUniswapAdapter(addressesProvider, uniswapRouter, wethAddress) {}
+    address wsysAddress
+  ) public BaseUniswapAdapter(addressesProvider, uniswapRouter, wsysAddress) {}
 
   /**
    * @dev Liquidate a non-healthy position collateral-wise, with a Health Factor below 1, using Flash Loan and Uniswap to repay flash loan premium.
@@ -59,7 +59,7 @@ contract FlashLiquidationAdapter is BaseUniswapAdapter {
    *   address borrowedAsset The asset that must be covered
    *   address user The user address with a Health Factor below 1
    *   uint256 debtToCover The amount of debt to cover
-   *   bool useEthPath Use WETH as connector path between the collateralAsset and borrowedAsset at Uniswap
+   *   bool useSysPath Use WSYS as connector path between the collateralAsset and borrowedAsset at Uniswap
    */
   function executeOperation(
     address[] calldata assets,
@@ -79,7 +79,7 @@ contract FlashLiquidationAdapter is BaseUniswapAdapter {
       decodedParams.borrowedAsset,
       decodedParams.user,
       decodedParams.debtToCover,
-      decodedParams.useEthPath,
+      decodedParams.useSysPath,
       amounts[0],
       premiums[0],
       initiator
@@ -94,7 +94,7 @@ contract FlashLiquidationAdapter is BaseUniswapAdapter {
    * @param borrowedAsset The asset that must be covered
    * @param user The user address with a Health Factor below 1
    * @param debtToCover The amount of debt to coverage, can be max(-1) to liquidate all possible debt
-   * @param useEthPath true if the swap needs to occur using ETH in the routing, false otherwise
+   * @param useSysPath true if the swap needs to occur using SYS in the routing, false otherwise
    * @param flashBorrowedAmount Amount of asset requested at the flash loan to liquidate the user position
    * @param premium Fee of the requested flash loan
    * @param initiator Address of the caller
@@ -104,7 +104,7 @@ contract FlashLiquidationAdapter is BaseUniswapAdapter {
     address borrowedAsset,
     address user,
     uint256 debtToCover,
-    bool useEthPath,
+    bool useSysPath,
     uint256 flashBorrowedAmount,
     uint256 premium,
     address initiator
@@ -144,7 +144,7 @@ contract FlashLiquidationAdapter is BaseUniswapAdapter {
         borrowedAsset,
         vars.diffCollateralBalance,
         vars.flashLoanDebt.sub(vars.diffFlashBorrowedBalance),
-        useEthPath
+        useSysPath
       );
       vars.remainingTokens = vars.diffCollateralBalance.sub(vars.soldAmount);
     } else {
@@ -167,7 +167,7 @@ contract FlashLiquidationAdapter is BaseUniswapAdapter {
    *   address borrowedAsset The asset that must be covered and will be exchanged to pay the flash loan premium
    *   address user The user address with a Health Factor below 1
    *   uint256 debtToCover The amount of debt to cover
-   *   bool useEthPath Use WETH as connector path between the collateralAsset and borrowedAsset at Uniswap
+   *   bool useSysPath Use WSYS as connector path between the collateralAsset and borrowedAsset at Uniswap
    * @return LiquidationParams struct containing decoded params
    */
   function _decodeParams(bytes memory params) internal pure returns (LiquidationParams memory) {
@@ -176,9 +176,9 @@ contract FlashLiquidationAdapter is BaseUniswapAdapter {
       address borrowedAsset,
       address user,
       uint256 debtToCover,
-      bool useEthPath
+      bool useSysPath
     ) = abi.decode(params, (address, address, address, uint256, bool));
 
-    return LiquidationParams(collateralAsset, borrowedAsset, user, debtToCover, useEthPath);
+    return LiquidationParams(collateralAsset, borrowedAsset, user, debtToCover, useSysPath);
   }
 }

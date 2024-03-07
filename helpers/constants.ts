@@ -35,14 +35,14 @@ export const MOCK_CHAINLINK_AGGREGATORS_PRICES = {
   WSYS: oneEther.multipliedBy('0.253620948469').toFixed(),
   USDC: oneEther.multipliedBy('0.99367714136416').toFixed(),
   USDT: oneEther.multipliedBy('1.00369068412860').toFixed(),
-  WETH: oneEther.multipliedBy('3601.332685').toFixed(),
-  WBTC: oneEther.multipliedBy('64030.332685').toFixed(),
+  ETH: oneEther.multipliedBy('3601.332685').toFixed(),
+  BTC: oneEther.multipliedBy('64030.332685').toFixed(),
 };
 
 export const chainlinkAggregatorProxy = {
   main: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
 };
 
-export const chainlinkEthUsdAggregatorProxy = {
+export const chainlinkSysUsdAggregatorProxy = {
   main: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
 };

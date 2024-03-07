@@ -18,7 +18,7 @@ task('balance-check', 'Checks deployer balance').setAction(async ({}, localBRE) 
         value: parseEther('0.15'),
       })
     ).wait();
-    console.log('- Sent 0.15 ETH to proxy admin');
+    console.log('- Sent 0.15 SYS to proxy admin');
   }
 
   console.log('\nAccounts');

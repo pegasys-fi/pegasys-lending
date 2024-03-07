@@ -4,7 +4,7 @@ pragma solidity >=0.6.2;
 interface IUniswapV2Router01 {
   function factory() external pure returns (address);
 
-  function WETH() external pure returns (address);
+  function WSYS() external pure returns (address);
 
   function addLiquidity(
     address tokenA,
@@ -15,29 +15,16 @@ interface IUniswapV2Router01 {
     uint256 amountBMin,
     address to,
     uint256 deadline
-  )
-    external
-    returns (
-      uint256 amountA,
-      uint256 amountB,
-      uint256 liquidity
-    );
+  ) external returns (uint256 amountA, uint256 amountB, uint256 liquidity);
 
-  function addLiquidityETH(
+  function addLiquiditySYS(
     address token,
     uint256 amountTokenDesired,
     uint256 amountTokenMin,
-    uint256 amountETHMin,
+    uint256 amountSYSMin,
     address to,
     uint256 deadline
-  )
-    external
-    payable
-    returns (
-      uint256 amountToken,
-      uint256 amountETH,
-      uint256 liquidity
-    );
+  ) external payable returns (uint256 amountToken, uint256 amountSYS, uint256 liquidity);
 
   function removeLiquidity(
     address tokenA,
@@ -49,14 +36,14 @@ interface IUniswapV2Router01 {
     uint256 deadline
   ) external returns (uint256 amountA, uint256 amountB);
 
-  function removeLiquidityETH(
+  function removeLiquiditySYS(
     address token,
     uint256 liquidity,
     uint256 amountTokenMin,
-    uint256 amountETHMin,
+    uint256 amountSYSMin,
     address to,
     uint256 deadline
-  ) external returns (uint256 amountToken, uint256 amountETH);
+  ) external returns (uint256 amountToken, uint256 amountSYS);
 
   function removeLiquidityWithPermit(
     address tokenA,
@@ -72,18 +59,18 @@ interface IUniswapV2Router01 {
     bytes32 s
   ) external returns (uint256 amountA, uint256 amountB);
 
-  function removeLiquidityETHWithPermit(
+  function removeLiquiditySYSWithPermit(
     address token,
     uint256 liquidity,
     uint256 amountTokenMin,
-    uint256 amountETHMin,
+    uint256 amountSYSMin,
     address to,
     uint256 deadline,
     bool approveMax,
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) external returns (uint256 amountToken, uint256 amountETH);
+  ) external returns (uint256 amountToken, uint256 amountSYS);
 
   function swapExactTokensForTokens(
     uint256 amountIn,
@@ -101,14 +88,14 @@ interface IUniswapV2Router01 {
     uint256 deadline
   ) external returns (uint256[] memory amounts);
 
-  function swapExactETHForTokens(
+  function swapExactSYSForTokens(
     uint256 amountOutMin,
     address[] calldata path,
     address to,
     uint256 deadline
   ) external payable returns (uint256[] memory amounts);
 
-  function swapTokensForExactETH(
+  function swapTokensForExactSYS(
     uint256 amountOut,
     uint256 amountInMax,
     address[] calldata path,
@@ -116,7 +103,7 @@ interface IUniswapV2Router01 {
     uint256 deadline
   ) external returns (uint256[] memory amounts);
 
-  function swapExactTokensForETH(
+  function swapExactTokensForSYS(
     uint256 amountIn,
     uint256 amountOutMin,
     address[] calldata path,
@@ -124,7 +111,7 @@ interface IUniswapV2Router01 {
     uint256 deadline
   ) external returns (uint256[] memory amounts);
 
-  function swapETHForExactTokens(
+  function swapSYSForExactTokens(
     uint256 amountOut,
     address[] calldata path,
     address to,
@@ -149,13 +136,13 @@ interface IUniswapV2Router01 {
     uint256 reserveOut
   ) external pure returns (uint256 amountIn);
 
-  function getAmountsOut(uint256 amountIn, address[] calldata path)
-    external
-    view
-    returns (uint256[] memory amounts);
+  function getAmountsOut(
+    uint256 amountIn,
+    address[] calldata path
+  ) external view returns (uint256[] memory amounts);
 
-  function getAmountsIn(uint256 amountOut, address[] calldata path)
-    external
-    view
-    returns (uint256[] memory amounts);
+  function getAmountsIn(
+    uint256 amountOut,
+    address[] calldata path
+  ) external view returns (uint256[] memory amounts);
 }

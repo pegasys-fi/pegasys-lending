@@ -1,7 +1,7 @@
 import { task } from 'hardhat/config';
 import { eContractid } from '../../helpers/types';
 import { deployUiPoolDataProviderV2 } from '../../helpers/contracts-deployments';
-import { chainlinkAggregatorProxy, chainlinkEthUsdAggregatorProxy } from '../../helpers/constants';
+import { chainlinkAggregatorProxy, chainlinkSysUsdAggregatorProxy } from '../../helpers/constants';
 
 task(`deploy-${eContractid.UiPoolDataProviderV2}`, `Deploys the UiPoolDataProviderV2 contract`)
   .addFlag('verify', 'Verify UiPoolDataProviderV2 contract via Etherscan API.')
@@ -17,7 +17,7 @@ task(`deploy-${eContractid.UiPoolDataProviderV2}`, `Deploys the UiPoolDataProvid
       }`
     );
     console.log(
-      `\n- UiPoolDataProviderV2 eth/usd price aggregator: ${
+      `\n- UiPoolDataProviderV2 sys/usd price aggregator: ${
         chainlinkAggregatorProxy[localBRE.network.name]
       }`
     );
@@ -25,7 +25,7 @@ task(`deploy-${eContractid.UiPoolDataProviderV2}`, `Deploys the UiPoolDataProvid
 
     const UiPoolDataProviderV2 = await deployUiPoolDataProviderV2(
       chainlinkAggregatorProxy[localBRE.network.name],
-      chainlinkEthUsdAggregatorProxy[localBRE.network.name],
+      chainlinkSysUsdAggregatorProxy[localBRE.network.name],
       verify
     );
 

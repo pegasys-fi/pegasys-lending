@@ -7,7 +7,7 @@ interface IUniswapExchange {
     uint256 indexed eth_sold,
     uint256 indexed tokens_bought
   );
-  event EthPurchase(address indexed buyer, uint256 indexed tokens_sold, uint256 indexed eth_bought);
+  event SysPurchase(address indexed buyer, uint256 indexed tokens_sold, uint256 indexed eth_bought);
   event AddLiquidity(
     address indexed provider,
     uint256 indexed eth_amount,

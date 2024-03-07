@@ -11,7 +11,7 @@ import {DataTypes} from '../protocol/libraries/types/DataTypes.sol';
 /**
  * @title UniswapRepayAdapter
  * @notice Uniswap V2 Adapter to perform a repay of a debt with collateral.
- * @author Aave
+ * @author Aave and Pegasys
  **/
 contract UniswapRepayAdapter is BaseUniswapAdapter {
   struct RepayParams {
@@ -19,14 +19,14 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
     uint256 collateralAmount;
     uint256 rateMode;
     PermitSignature permitSignature;
-    bool useEthPath;
+    bool useSysPath;
   }
 
   constructor(
     ILendingPoolAddressesProvider addressesProvider,
     IUniswapV2Router02 uniswapRouter,
-    address wethAddress
-  ) public BaseUniswapAdapter(addressesProvider, uniswapRouter, wethAddress) {}
+    address wsysAddress
+  ) public BaseUniswapAdapter(addressesProvider, uniswapRouter, wsysAddress) {}
 
   /**
    * @dev Uses the received funds from the flash loan to repay a debt on the protocol on behalf of the user. Then pulls
@@ -68,7 +68,7 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
       initiator,
       premiums[0],
       decodedParams.permitSignature,
-      decodedParams.useEthPath
+      decodedParams.useSysPath
     );
 
     return true;
@@ -85,7 +85,7 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
    * @param debtRepayAmount Amount of the debt to be repaid
    * @param debtRateMode Rate mode of the debt to be repaid
    * @param permitSignature struct containing the permit signature
-   * @param useEthPath struct containing the permit signature
+   * @param useSysPath struct containing the permit signature
 
    */
   function swapAndRepay(
@@ -95,15 +95,15 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
     uint256 debtRepayAmount,
     uint256 debtRateMode,
     PermitSignature calldata permitSignature,
-    bool useEthPath
+    bool useSysPath
   ) external {
     DataTypes.ReserveData memory collateralReserveData = _getReserveData(collateralAsset);
     DataTypes.ReserveData memory debtReserveData = _getReserveData(debtAsset);
 
-    address debtToken =
-      DataTypes.InterestRateMode(debtRateMode) == DataTypes.InterestRateMode.STABLE
-        ? debtReserveData.stableDebtTokenAddress
-        : debtReserveData.variableDebtTokenAddress;
+    address debtToken = DataTypes.InterestRateMode(debtRateMode) ==
+      DataTypes.InterestRateMode.STABLE
+      ? debtReserveData.stableDebtTokenAddress
+      : debtReserveData.variableDebtTokenAddress;
 
     uint256 currentDebt = IERC20(debtToken).balanceOf(msg.sender);
     uint256 amountToRepay = debtRepayAmount <= currentDebt ? debtRepayAmount : currentDebt;
@@ -115,8 +115,12 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
       }
 
       // Get exact collateral needed for the swap to avoid leftovers
-      uint256[] memory amounts =
-        _getAmountsIn(collateralAsset, debtAsset, amountToRepay, useEthPath);
+      uint256[] memory amounts = _getAmountsIn(
+        collateralAsset,
+        debtAsset,
+        amountToRepay,
+        useSysPath
+      );
       require(amounts[0] <= maxCollateralToSwap, 'slippage too high');
 
       // Pull aTokens from user
@@ -129,7 +133,7 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
       );
 
       // Swap collateral for debt asset
-      _swapTokensForExactTokens(collateralAsset, debtAsset, amounts[0], amountToRepay, useEthPath);
+      _swapTokensForExactTokens(collateralAsset, debtAsset, amounts[0], amountToRepay, useSysPath);
     } else {
       // Pull aTokens from user
       _pullAToken(
@@ -168,7 +172,7 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
     address initiator,
     uint256 premium,
     PermitSignature memory permitSignature,
-    bool useEthPath
+    bool useSysPath
   ) internal {
     DataTypes.ReserveData memory collateralReserveData = _getReserveData(collateralAsset);
 
@@ -186,8 +190,12 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
       }
 
       uint256 neededForFlashLoanDebt = repaidAmount.add(premium);
-      uint256[] memory amounts =
-        _getAmountsIn(collateralAsset, debtAsset, neededForFlashLoanDebt, useEthPath);
+      uint256[] memory amounts = _getAmountsIn(
+        collateralAsset,
+        debtAsset,
+        neededForFlashLoanDebt,
+        useSysPath
+      );
       require(amounts[0] <= maxCollateralToSwap, 'slippage too high');
 
       // Pull aTokens from user
@@ -205,7 +213,7 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
         debtAsset,
         amounts[0],
         neededForFlashLoanDebt,
-        useEthPath
+        useSysPath
       );
     } else {
       // Pull aTokens from user
@@ -234,7 +242,7 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
    *   uint8 v V param for the permit signature
    *   bytes32 r R param for the permit signature
    *   bytes32 s S param for the permit signature
-   *   bool useEthPath use WETH path route
+   *   bool useSysPath use WSYS path route
    * @return RepayParams struct containing decoded params
    */
   function _decodeParams(bytes memory params) internal pure returns (RepayParams memory) {
@@ -247,9 +255,8 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
       uint8 v,
       bytes32 r,
       bytes32 s,
-      bool useEthPath
-    ) =
-      abi.decode(
+      bool useSysPath
+    ) = abi.decode(
         params,
         (address, uint256, uint256, uint256, uint256, uint8, bytes32, bytes32, bool)
       );
@@ -260,7 +267,7 @@ contract UniswapRepayAdapter is BaseUniswapAdapter {
         collateralAmount,
         rateMode,
         PermitSignature(permitAmount, deadline, v, r, s),
-        useEthPath
+        useSysPath
       );
   }
 }

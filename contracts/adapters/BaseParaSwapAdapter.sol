@@ -37,7 +37,12 @@ abstract contract BaseParaSwapAdapter is FlashLoanReceiverBase, Ownable {
 
   IPriceOracleGetter public immutable ORACLE;
 
-  event Swapped(address indexed fromAsset, address indexed toAsset, uint256 fromAmount, uint256 receivedAmount);
+  event Swapped(
+    address indexed fromAsset,
+    address indexed toAsset,
+    uint256 fromAmount,
+    uint256 receivedAmount
+  );
 
   constructor(
     ILendingPoolAddressesProvider addressesProvider
@@ -46,9 +51,9 @@ abstract contract BaseParaSwapAdapter is FlashLoanReceiverBase, Ownable {
   }
 
   /**
-   * @dev Get the price of the asset from the oracle denominated in eth
+   * @dev Get the price of the asset from the oracle denominated in sys
    * @param asset address
-   * @return eth price for the asset
+   * @return sys price for the asset
    */
   function _getPrice(address asset) internal view returns (uint256) {
     return ORACLE.getAssetPrice(asset);

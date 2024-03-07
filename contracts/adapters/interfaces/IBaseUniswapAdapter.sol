@@ -24,7 +24,7 @@ interface IBaseUniswapAdapter {
     address[] path;
   }
 
-  function WETH_ADDRESS() external returns (address);
+  function WSYS_ADDRESS() external returns (address);
 
   function MAX_SLIPPAGE_PERCENT() external returns (uint256);
 
@@ -51,16 +51,7 @@ interface IBaseUniswapAdapter {
     uint256 amountIn,
     address reserveIn,
     address reserveOut
-  )
-    external
-    view
-    returns (
-      uint256,
-      uint256,
-      uint256,
-      uint256,
-      address[] memory
-    );
+  ) external view returns (uint256, uint256, uint256, uint256, address[] memory);
 
   /**
    * @dev Returns the minimum input asset amount required to buy the given output asset amount and the prices
@@ -77,14 +68,5 @@ interface IBaseUniswapAdapter {
     uint256 amountOut,
     address reserveIn,
     address reserveOut
-  )
-    external
-    view
-    returns (
-      uint256,
-      uint256,
-      uint256,
-      uint256,
-      address[] memory
-    );
+  ) external view returns (uint256, uint256, uint256, uint256, address[] memory);
 }

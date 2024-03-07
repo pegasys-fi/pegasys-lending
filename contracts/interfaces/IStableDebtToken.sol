@@ -2,13 +2,13 @@
 pragma solidity 0.6.12;
 
 import {IInitializableDebtToken} from './IInitializableDebtToken.sol';
-import {IAaveIncentivesController} from './IAaveIncentivesController.sol';
+import {IPegasysIncentivesController} from './IPegasysIncentivesController.sol';
 
 /**
  * @title IStableDebtToken
  * @notice Defines the interface for the stable debt token
  * @dev It does not inherit from IERC20 to save in code size
- * @author Aave
+ * @author Aave and Pegasys
  **/
 
 interface IStableDebtToken is IInitializableDebtToken {
@@ -99,15 +99,7 @@ interface IStableDebtToken is IInitializableDebtToken {
   /**
    * @dev Returns the principal, the total supply and the average stable rate
    **/
-  function getSupplyData()
-    external
-    view
-    returns (
-      uint256,
-      uint256,
-      uint256,
-      uint40
-    );
+  function getSupplyData() external view returns (uint256, uint256, uint256, uint40);
 
   /**
    * @dev Returns the timestamp of the last update of the total supply
@@ -129,5 +121,5 @@ interface IStableDebtToken is IInitializableDebtToken {
   /**
    * @dev Returns the address of the incentives controller contract
    **/
-  function getIncentivesController() external view returns (IAaveIncentivesController);
+  function getIncentivesController() external view returns (IPegasysIncentivesController);
 }

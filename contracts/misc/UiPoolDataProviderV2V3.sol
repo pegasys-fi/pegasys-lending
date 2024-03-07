@@ -6,7 +6,7 @@ import {IERC20Detailed} from '../dependencies/openzeppelin/contracts/IERC20Detai
 import {ILendingPoolAddressesProvider} from '../interfaces/ILendingPoolAddressesProvider.sol';
 import {IUiPoolDataProviderV3} from './interfaces/IUiPoolDataProviderV3.sol';
 import {ILendingPool} from '../interfaces/ILendingPool.sol';
-import {IAaveOracle} from './interfaces/IAaveOracle.sol';
+import {IPegasysOracle} from './interfaces/IPegasysOracle.sol';
 import {IAToken} from '../interfaces/IAToken.sol';
 import {IVariableDebtToken} from '../interfaces/IVariableDebtToken.sol';
 import {IStableDebtToken} from '../interfaces/IStableDebtToken.sol';
@@ -15,9 +15,7 @@ import {ReserveConfiguration} from '../protocol/libraries/configuration/ReserveC
 import {UserConfiguration} from '../protocol/libraries/configuration/UserConfiguration.sol';
 import {DataTypes} from '../protocol/libraries/types/DataTypes.sol';
 import {IChainlinkAggregator} from '../interfaces/IChainlinkAggregator.sol';
-import {
-  DefaultReserveInterestRateStrategy
-} from '../protocol/lendingpool/DefaultReserveInterestRateStrategy.sol';
+import {DefaultReserveInterestRateStrategy} from '../protocol/lendingpool/DefaultReserveInterestRateStrategy.sol';
 import {IERC20DetailedBytes} from './interfaces/IERC20DetailedBytes.sol';
 import {ILendingRateOracle} from '../interfaces/ILendingRateOracle.sol';
 
@@ -28,7 +26,7 @@ contract UiPoolDataProviderV2V3 is IUiPoolDataProviderV3 {
 
   IChainlinkAggregator public immutable networkBaseTokenPriceInUsdProxyAggregator;
   IChainlinkAggregator public immutable marketReferenceCurrencyPriceInUsdProxyAggregator;
-  uint256 public constant ETH_CURRENCY_UNIT = 1 ether;
+  uint256 public constant SYS_CURRENCY_UNIT = 1 ether;
   address public constant MKRAddress = 0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2;
 
   constructor(
@@ -39,11 +37,11 @@ contract UiPoolDataProviderV2V3 is IUiPoolDataProviderV3 {
     marketReferenceCurrencyPriceInUsdProxyAggregator = _marketReferenceCurrencyPriceInUsdProxyAggregator;
   }
 
-  function getInterestRateStrategySlopes(DefaultReserveInterestRateStrategy interestRateStrategy, ILendingPoolAddressesProvider provider, address reserve)
-    internal
-    view
-    returns(InterestRates memory)
-  {
+  function getInterestRateStrategySlopes(
+    DefaultReserveInterestRateStrategy interestRateStrategy,
+    ILendingPoolAddressesProvider provider,
+    address reserve
+  ) internal view returns (InterestRates memory) {
     InterestRates memory interestRates;
     interestRates.variableRateSlope1 = interestRateStrategy.variableRateSlope1();
     interestRates.variableRateSlope2 = interestRateStrategy.variableRateSlope2();
@@ -53,28 +51,22 @@ contract UiPoolDataProviderV2V3 is IUiPoolDataProviderV3 {
     interestRates.optimalUsageRatio = interestRateStrategy.OPTIMAL_UTILIZATION_RATE();
 
     interestRates.baseStableBorrowRate = ILendingRateOracle(provider.getLendingRateOracle())
-          .getMarketBorrowRate(reserve);
+      .getMarketBorrowRate(reserve);
 
     return interestRates;
   }
 
-  function getReservesList(ILendingPoolAddressesProvider provider)
-    public
-    view
-    override
-    returns (address[] memory)
-  {
+  function getReservesList(
+    ILendingPoolAddressesProvider provider
+  ) public view override returns (address[] memory) {
     ILendingPool lendingPool = ILendingPool(provider.getLendingPool());
     return lendingPool.getReservesList();
   }
 
-  function getReservesData(ILendingPoolAddressesProvider provider)
-    public
-    view
-    override
-    returns (AggregatedReserveData[] memory, BaseCurrencyInfo memory)
-  {
-    IAaveOracle oracle = IAaveOracle(provider.getPriceOracle());
+  function getReservesData(
+    ILendingPoolAddressesProvider provider
+  ) public view override returns (AggregatedReserveData[] memory, BaseCurrencyInfo memory) {
+    IPegasysOracle oracle = IPegasysOracle(provider.getPriceOracle());
     ILendingPool lendingPool = ILendingPool(provider.getLendingPool());
     address[] memory reserves = lendingPool.getReservesList();
     AggregatedReserveData[] memory reservesData = new AggregatedReserveData[](reserves.length);
@@ -84,8 +76,9 @@ contract UiPoolDataProviderV2V3 is IUiPoolDataProviderV3 {
       reserveData.underlyingAsset = reserves[i];
 
       // reserve current state
-      DataTypes.ReserveData memory baseData =
-        lendingPool.getReserveData(reserveData.underlyingAsset);
+      DataTypes.ReserveData memory baseData = lendingPool.getReserveData(
+        reserveData.underlyingAsset
+      );
       reserveData.liquidityIndex = baseData.liquidityIndex;
       reserveData.variableBorrowIndex = baseData.variableBorrowIndex;
       reserveData.liquidityRate = baseData.currentLiquidityRate;
@@ -139,7 +132,9 @@ contract UiPoolDataProviderV2V3 is IUiPoolDataProviderV3 {
       reserveData.usageAsCollateralEnabled = reserveData.baseLTVasCollateral != 0;
 
       InterestRates memory interestRates = getInterestRateStrategySlopes(
-        DefaultReserveInterestRateStrategy(reserveData.interestRateStrategyAddress), provider, reserveData.underlyingAsset
+        DefaultReserveInterestRateStrategy(reserveData.interestRateStrategyAddress),
+        provider,
+        reserveData.underlyingAsset
       );
 
       reserveData.variableRateSlope1 = interestRates.variableRateSlope1;
@@ -159,8 +154,8 @@ contract UiPoolDataProviderV2V3 is IUiPoolDataProviderV3 {
       .decimals();
 
     try oracle.BASE_CURRENCY_UNIT() returns (uint256 baseCurrencyUnit) {
-      if (ETH_CURRENCY_UNIT == baseCurrencyUnit) {
-        baseCurrencyInfo.marketReferenceCurrencyUnit = ETH_CURRENCY_UNIT;
+      if (SYS_CURRENCY_UNIT == baseCurrencyUnit) {
+        baseCurrencyInfo.marketReferenceCurrencyUnit = SYS_CURRENCY_UNIT;
         baseCurrencyInfo
           .marketReferenceCurrencyPriceInUsd = marketReferenceCurrencyPriceInUsdProxyAggregator
           .latestAnswer();
@@ -168,10 +163,8 @@ contract UiPoolDataProviderV2V3 is IUiPoolDataProviderV3 {
         baseCurrencyInfo.marketReferenceCurrencyUnit = baseCurrencyUnit;
         baseCurrencyInfo.marketReferenceCurrencyPriceInUsd = int256(baseCurrencyUnit);
       }
-    } catch (
-      bytes memory /*lowLevelData*/
-    ) {
-      baseCurrencyInfo.marketReferenceCurrencyUnit = ETH_CURRENCY_UNIT;
+    } catch (bytes memory /*lowLevelData*/) {
+      baseCurrencyInfo.marketReferenceCurrencyUnit = SYS_CURRENCY_UNIT;
       baseCurrencyInfo
         .marketReferenceCurrencyPriceInUsd = marketReferenceCurrencyPriceInUsdProxyAggregator
         .latestAnswer();
@@ -180,18 +173,17 @@ contract UiPoolDataProviderV2V3 is IUiPoolDataProviderV3 {
     return (reservesData, baseCurrencyInfo);
   }
 
-  function getUserReservesData(ILendingPoolAddressesProvider provider, address user)
-    external
-    view
-    override
-    returns (UserReserveData[] memory, uint8)
-  {
+  function getUserReservesData(
+    ILendingPoolAddressesProvider provider,
+    address user
+  ) external view override returns (UserReserveData[] memory, uint8) {
     ILendingPool lendingPool = ILendingPool(provider.getLendingPool());
     address[] memory reserves = lendingPool.getReservesList();
     DataTypes.UserConfigurationMap memory userConfig = lendingPool.getUserConfiguration(user);
 
-    UserReserveData[] memory userReservesData =
-      new UserReserveData[](user != address(0) ? reserves.length : 0);
+    UserReserveData[] memory userReservesData = new UserReserveData[](
+      user != address(0) ? reserves.length : 0
+    );
 
     for (uint256 i = 0; i < reserves.length; i++) {
       DataTypes.ReserveData memory baseData = lendingPool.getReserveData(reserves[i]);
@@ -205,20 +197,16 @@ contract UiPoolDataProviderV2V3 is IUiPoolDataProviderV3 {
 
       if (userConfig.isBorrowing(i)) {
         userReservesData[i].scaledVariableDebt = IVariableDebtToken(
-          baseData
-            .variableDebtTokenAddress
-        )
-          .scaledBalanceOf(user);
+          baseData.variableDebtTokenAddress
+        ).scaledBalanceOf(user);
         userReservesData[i].principalStableDebt = IStableDebtToken(baseData.stableDebtTokenAddress)
           .principalBalanceOf(user);
         if (userReservesData[i].principalStableDebt != 0) {
           userReservesData[i].stableBorrowRate = IStableDebtToken(baseData.stableDebtTokenAddress)
             .getUserStableRate(user);
           userReservesData[i].stableBorrowLastUpdateTimestamp = IStableDebtToken(
-            baseData
-              .stableDebtTokenAddress
-          )
-            .getUserLastUpdated(user);
+            baseData.stableDebtTokenAddress
+          ).getUserLastUpdated(user);
         }
       }
     }

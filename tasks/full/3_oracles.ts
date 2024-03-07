@@ -1,18 +1,18 @@
 import { task } from 'hardhat/config';
 import { getParamPerNetwork } from '../../helpers/contracts-helpers';
-import { deployAaveOracle, deployLendingRateOracle } from '../../helpers/contracts-deployments';
+import { deployPegasysOracle, deployLendingRateOracle } from '../../helpers/contracts-deployments';
 import { setInitialMarketRatesInRatesOracleByHelper } from '../../helpers/oracles-helpers';
 import { ICommonConfiguration, eEthereumNetwork, SymbolMap } from '../../helpers/types';
 import { waitForTx, notFalsyOrZeroAddress } from '../../helpers/misc-utils';
 import {
   ConfigNames,
   loadPoolConfig,
-  getWethAddress,
+  getWsysAddress,
   getGenesisPoolAdmin,
   getLendingRateOracles,
 } from '../../helpers/configuration';
 import {
-  getAaveOracle,
+  getPegasysOracle,
   getLendingPoolAddressesProvider,
   getLendingRateOracle,
   getPairTokenIndexes,
@@ -30,36 +30,34 @@ task('full:deploy-oracles', 'Deploy oracles for dev enviroment')
         ProtocolGlobalParams: { UsdAddress },
         ReserveAssets,
         FallbackOracle,
-        // ChainlinkAggregator,
+        SupraOracle,
       } = poolConfig as ICommonConfiguration;
       const lendingRateOracles = getLendingRateOracles(poolConfig);
       const addressesProvider = await getLendingPoolAddressesProvider();
       const admin = await getGenesisPoolAdmin(poolConfig);
-      const AaveOracleAddress = getParamPerNetwork(poolConfig.AaveOracle, network);
+      const PegasysOracleAddress = getParamPerNetwork(poolConfig.PegasysOracle, network);
       const lendingRateOracleAddress = getParamPerNetwork(poolConfig.LendingRateOracle, network);
       const fallbackOracleAddress = await getParamPerNetwork(FallbackOracle, network);
       const reserveAssets = await getParamPerNetwork(ReserveAssets, network);
-      // const chainlinkAggregators = await getParamPerNetwork(ChainlinkAggregator, network);
+      const oracle = await getParamPerNetwork(SupraOracle, network);
 
       const tokensToWatch: SymbolMap<string> = {
         ...reserveAssets,
         USD: UsdAddress,
       };
-      // const [tokens, aggregators] = getPairsTokenAggregator(tokensToWatch, chainlinkAggregators);
 
       const [tokens, indexes] = getPairTokenIndexes(network);
 
-      let oracle = '0xbc0453F6FAC74FB46223EA5CC55Bd82852f0C670';
-
-      const AaveOracle = notFalsyOrZeroAddress(AaveOracleAddress)
-        ? await getAaveOracle(AaveOracleAddress)
-        : await deployAaveOracle(
+      const PegasysOracle = notFalsyOrZeroAddress(PegasysOracleAddress)
+        ? await getPegasysOracle(PegasysOracleAddress)
+        : await deployPegasysOracle(
             [
               tokens,
               indexes,
-              '0x4200000000000000000000000000000000000006',
-              fallbackOracleAddress,
               oracle,
+              fallbackOracleAddress,
+              '0x0000000000000000000000000000000000000000',
+              '100000000',
             ],
             verify
           );
@@ -79,7 +77,7 @@ task('full:deploy-oracles', 'Deploy oracles for dev enviroment')
       }
 
       // Register the proxy price provider on the addressesProvider
-      await waitForTx(await addressesProvider.setPriceOracle(AaveOracle.address));
+      await waitForTx(await addressesProvider.setPriceOracle(PegasysOracle.address));
       await waitForTx(await addressesProvider.setLendingRateOracle(lendingRateOracle.address));
     } catch (error) {
       throw error;

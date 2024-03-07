@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 /**
  * @title IReserveInterestRateStrategyInterface interface
  * @dev Interface for the calculation of the interest rates
- * @author Aave
+ * @author Aave and Pegasys
  */
 interface IReserveInterestRateStrategy {
   function baseVariableBorrowRate() external view returns (uint256);
@@ -18,14 +18,7 @@ interface IReserveInterestRateStrategy {
     uint256 totalVariableDebt,
     uint256 averageStableBorrowRate,
     uint256 reserveFactor
-  )
-    external
-    view
-    returns (
-      uint256,
-      uint256,
-      uint256
-    );
+  ) external view returns (uint256, uint256, uint256);
 
   function calculateInterestRates(
     address reserve,
@@ -39,9 +32,5 @@ interface IReserveInterestRateStrategy {
   )
     external
     view
-    returns (
-      uint256 liquidityRate,
-      uint256 stableBorrowRate,
-      uint256 variableBorrowRate
-    );
+    returns (uint256 liquidityRate, uint256 stableBorrowRate, uint256 variableBorrowRate);
 }

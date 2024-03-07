@@ -8,7 +8,7 @@ contract PriceOracle is IPriceOracle {
   uint256 ethPriceUsd;
 
   event AssetPriceUpdated(address _asset, uint256 _price, uint256 timestamp);
-  event EthPriceUpdated(uint256 _price, uint256 timestamp);
+  event SysPriceUpdated(uint256 _price, uint256 timestamp);
 
   function getAssetPrice(address _asset) external view override returns (uint256) {
     return prices[_asset];
@@ -19,12 +19,12 @@ contract PriceOracle is IPriceOracle {
     emit AssetPriceUpdated(_asset, _price, block.timestamp);
   }
 
-  function getEthUsdPrice() external view returns (uint256) {
+  function getSysUsdPrice() external view returns (uint256) {
     return ethPriceUsd;
   }
 
-  function setEthUsdPrice(uint256 _price) external {
+  function setSysUsdPrice(uint256 _price) external {
     ethPriceUsd = _price;
-    emit EthPriceUpdated(_price, block.timestamp);
+    emit SysPriceUpdated(_price, block.timestamp);
   }
 }

@@ -9,7 +9,7 @@ import { BuidlerRuntimeEnvironment } from '@nomiclabs/buidler/types';
 import { tEthereumAddress } from './types';
 import { isAddress } from 'ethers/lib/utils';
 import { isZeroAddress } from 'ethereumjs-util';
-import { SignerWithAddress } from '../test-suites/test-aave/helpers/make-suite';
+import { SignerWithAddress } from '../test-suites/test-pegasys/helpers/make-suite';
 
 export const toWad = (value: string | number) => new BigNumber(value).times(WAD).toFixed();
 

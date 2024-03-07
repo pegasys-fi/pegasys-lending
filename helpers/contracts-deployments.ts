@@ -4,7 +4,7 @@ import {
   tEthereumAddress,
   eContractid,
   tStringTokenSmallUnits,
-  AavePools,
+  PegasysPools,
   TokenContractId,
   iMultiPoolsAssets,
   IReserveParams,
@@ -16,10 +16,10 @@ import { MockContract } from 'ethereum-waffle';
 import { ConfigNames, getReservesConfigByPool, loadPoolConfig } from './configuration';
 import { getFirstSigner } from './contracts-getters';
 import {
-  AaveProtocolDataProviderFactory,
+  PegasysProtocolDataProviderFactory,
   ATokenFactory,
   ATokensAndRatesHelperFactory,
-  AaveOracleFactory,
+  PegasysOracleFactory,
   DefaultReserveInterestRateStrategyFactory,
   DelegationAwareATokenFactory,
   InitializableAdminUpgradeabilityProxyFactory,
@@ -48,8 +48,8 @@ import {
   UniswapRepayAdapterFactory,
   VariableDebtTokenFactory,
   WalletBalanceProviderFactory,
-  WETH9MockedFactory,
-  WETHGatewayFactory,
+  WSYSMockedFactory,
+  WSYSGatewayFactory,
   FlashLiquidationAdapterFactory,
   UiPoolDataProviderV2Factory,
   UiPoolDataProviderV2V3Factory,
@@ -92,40 +92,40 @@ export const deployUiIncentiveDataProviderV2V3 = async (verify?: boolean) => {
 
 export const deployUiPoolDataProviderV2 = async (
   chainlinkAggregatorProxy: string,
-  chainlinkEthUsdAggregatorProxy: string,
+  chainlinkSysUsdAggregatorProxy: string,
   verify?: boolean
 ) =>
   withSaveAndVerify(
     await new UiPoolDataProviderV2Factory(await getFirstSigner()).deploy(
       chainlinkAggregatorProxy,
-      chainlinkEthUsdAggregatorProxy
+      chainlinkSysUsdAggregatorProxy
     ),
     eContractid.UiPoolDataProvider,
-    [chainlinkAggregatorProxy, chainlinkEthUsdAggregatorProxy],
+    [chainlinkAggregatorProxy, chainlinkSysUsdAggregatorProxy],
     verify
   );
 
 export const deployUiPoolDataProviderV2V3 = async (
   chainlinkAggregatorProxy: string,
-  chainlinkEthUsdAggregatorProxy: string,
+  chainlinkSysUsdAggregatorProxy: string,
   verify?: boolean
 ) =>
   withSaveAndVerify(
     await new UiPoolDataProviderV2V3Factory(await getFirstSigner()).deploy(
       chainlinkAggregatorProxy,
-      chainlinkEthUsdAggregatorProxy
+      chainlinkSysUsdAggregatorProxy
     ),
     eContractid.UiPoolDataProvider,
-    [chainlinkAggregatorProxy, chainlinkEthUsdAggregatorProxy],
+    [chainlinkAggregatorProxy, chainlinkSysUsdAggregatorProxy],
     verify
   );
 
 export const deployUiPoolDataProvider = async (
-  [incentivesController, aaveOracle]: [tEthereumAddress, tEthereumAddress],
+  [incentivesController, pegasysOracle]: [tEthereumAddress, tEthereumAddress],
   verify?: boolean
 ) => {
   const id = eContractid.UiPoolDataProvider;
-  const args: string[] = [incentivesController, aaveOracle];
+  const args: string[] = [incentivesController, pegasysOracle];
   const instance = await deployContract<UiPoolDataProvider>(id, args);
   if (verify) {
     await verifyContract(id, instance, args);
@@ -222,7 +222,7 @@ export const deployValidationLogic = async (
   return withSaveAndVerify(validationLogic, eContractid.ValidationLogic, [], verify);
 };
 
-export const deployAaveLibraries = async (
+export const deployPegasysLibraries = async (
   verify?: boolean
 ): Promise<LendingPoolLibraryAddresses> => {
   const reserveLogic = await deployReserveLogicLibrary(verify);
@@ -247,7 +247,7 @@ export const deployAaveLibraries = async (
 };
 
 export const deployLendingPool = async (verify?: boolean) => {
-  const libraries = await deployAaveLibraries(verify);
+  const libraries = await deployPegasysLibraries(verify);
   const lendingPoolImpl = await new LendingPoolFactory(libraries, await getFirstSigner()).deploy();
   await insertContractAddressInDb(eContractid.LendingPoolImpl, lendingPoolImpl.address);
   return withSaveAndVerify(lendingPoolImpl, eContractid.LendingPool, [], verify);
@@ -277,13 +277,13 @@ export const deployMockAggregator = async (price: tStringTokenSmallUnits, verify
     verify
   );
 
-export const deployAaveOracle = async (
+export const deployPegasysOracle = async (
   args: [tEthereumAddress[], BigNumberish[], tEthereumAddress, tEthereumAddress, tEthereumAddress],
   verify?: boolean
 ) =>
   withSaveAndVerify(
-    await new AaveOracleFactory(await getFirstSigner()).deploy(...args),
-    eContractid.AaveOracle,
+    await new PegasysOracleFactory(await getFirstSigner()).deploy(...args),
+    eContractid.PegasysOracle,
     args,
     verify
   );
@@ -331,13 +331,13 @@ export const deployWalletBalancerProvider = async (verify?: boolean) =>
     verify
   );
 
-export const deployAaveProtocolDataProvider = async (
+export const deployPegasysProtocolDataProvider = async (
   addressesProvider: tEthereumAddress,
   verify?: boolean
 ) =>
   withSaveAndVerify(
-    await new AaveProtocolDataProviderFactory(await getFirstSigner()).deploy(addressesProvider),
-    eContractid.AaveProtocolDataProvider,
+    await new PegasysProtocolDataProviderFactory(await getFirstSigner()).deploy(addressesProvider),
+    eContractid.PegasysProtocolDataProvider,
     [addressesProvider],
     verify
   );
@@ -505,7 +505,7 @@ export const deployDelegationAwareATokenImpl = async (verify: boolean) =>
 export const deployAllMockTokens = async (verify?: boolean) => {
   const tokens: { [symbol: string]: MockContract | MintableERC20 } = {};
 
-  const protoConfigData = getReservesConfigByPool(AavePools.proto);
+  const protoConfigData = getReservesConfigByPool(PegasysPools.proto);
 
   for (const tokenSymbol of Object.keys(TokenContractId)) {
     let decimals = '18';
@@ -564,20 +564,20 @@ export const deployATokensAndRatesHelper = async (
     verify
   );
 
-export const deployWETHGateway = async (args: [tEthereumAddress], verify?: boolean) =>
+export const deployWSYSGateway = async (args: [tEthereumAddress], verify?: boolean) =>
   withSaveAndVerify(
-    await new WETHGatewayFactory(await getFirstSigner()).deploy(...args),
-    eContractid.WETHGateway,
+    await new WSYSGatewayFactory(await getFirstSigner()).deploy(...args),
+    eContractid.WSYSGateway,
     args,
     verify
   );
 
-export const authorizeWETHGateway = async (
-  wethGateWay: tEthereumAddress,
+export const authorizeWSYSGateway = async (
+  wsysGateWay: tEthereumAddress,
   lendingPool: tEthereumAddress
 ) =>
-  await new WETHGatewayFactory(await getFirstSigner())
-    .attach(wethGateWay)
+  await new WSYSGatewayFactory(await getFirstSigner())
+    .attach(wsysGateWay)
     .authorizeLendingPool(lendingPool);
 
 export const deployMockStableDebtToken = async (
@@ -596,10 +596,10 @@ export const deployMockStableDebtToken = async (
   return instance;
 };
 
-export const deployWETHMocked = async (verify?: boolean) =>
+export const deployWSYSMocked = async (verify?: boolean) =>
   withSaveAndVerify(
-    await new WETH9MockedFactory(await getFirstSigner()).deploy(),
-    eContractid.WETHMocked,
+    await new WSYSMockedFactory(await getFirstSigner()).deploy(),
+    eContractid.WSYSMocked,
     [],
     verify
   );

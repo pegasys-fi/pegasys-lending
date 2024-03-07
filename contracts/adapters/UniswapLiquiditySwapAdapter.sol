@@ -10,7 +10,7 @@ import {IERC20} from '../dependencies/openzeppelin/contracts/IERC20.sol';
 /**
  * @title UniswapLiquiditySwapAdapter
  * @notice Uniswap V2 Adapter to swap liquidity.
- * @author Aave
+ * @author Aave and Pegasys
  **/
 contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
   struct PermitParams {
@@ -26,14 +26,14 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
     uint256[] minAmountsToReceive;
     bool[] swapAllBalance;
     PermitParams permitParams;
-    bool[] useEthPath;
+    bool[] useSysPath;
   }
 
   constructor(
     ILendingPoolAddressesProvider addressesProvider,
     IUniswapV2Router02 uniswapRouter,
-    address wethAddress
-  ) public BaseUniswapAdapter(addressesProvider, uniswapRouter, wethAddress) {}
+    address wsysAddress
+  ) public BaseUniswapAdapter(addressesProvider, uniswapRouter, wsysAddress) {}
 
   /**
    * @dev Swaps the received reserve amount from the flash loan into the asset specified in the params.
@@ -74,7 +74,7 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
         assets.length == decodedParams.permitParams.v.length &&
         assets.length == decodedParams.permitParams.r.length &&
         assets.length == decodedParams.permitParams.s.length &&
-        assets.length == decodedParams.useEthPath.length,
+        assets.length == decodedParams.useSysPath.length,
       'INCONSISTENT_PARAMS'
     );
 
@@ -94,7 +94,7 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
           decodedParams.permitParams.r[i],
           decodedParams.permitParams.s[i]
         ),
-        decodedParams.useEthPath[i]
+        decodedParams.useSysPath[i]
       );
     }
 
@@ -125,7 +125,7 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
    *   uint8 v param for the permit signature
    *   bytes32 r param for the permit signature
    *   bytes32 s param for the permit signature
-   * @param useEthPath true if the swap needs to occur using ETH in the routing, false otherwise
+   * @param useSysPath true if the swap needs to occur using SYS in the routing, false otherwise
    */
   function swapAndDeposit(
     address[] calldata assetToSwapFromList,
@@ -133,7 +133,7 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
     uint256[] calldata amountToSwapList,
     uint256[] calldata minAmountsToReceive,
     PermitSignature[] calldata permitParams,
-    bool[] calldata useEthPath
+    bool[] calldata useSysPath
   ) external {
     require(
       assetToSwapFromList.length == assetToSwapToList.length &&
@@ -166,7 +166,7 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
         assetToSwapToList[vars.i],
         vars.amountToSwap,
         minAmountsToReceive[vars.i],
-        useEthPath[vars.i]
+        useSysPath[vars.i]
       );
 
       // Deposit new reserve
@@ -185,7 +185,7 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
    * @param minAmountToReceive Min amount to be received from the swap
    * @param swapAllBalance Flag indicating if all the user balance should be swapped
    * @param permitSignature List of struct containing the permit signature
-   * @param useEthPath true if the swap needs to occur using ETH in the routing, false otherwise
+   * @param useSysPath true if the swap needs to occur using SYS in the routing, false otherwise
    */
 
   struct SwapLiquidityLocalVars {
@@ -206,7 +206,7 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
     uint256 minAmountToReceive,
     bool swapAllBalance,
     PermitSignature memory permitSignature,
-    bool useEthPath
+    bool useSysPath
   ) internal {
     SwapLiquidityLocalVars memory vars;
 
@@ -222,7 +222,7 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
       assetTo,
       vars.amountToSwap,
       minAmountToReceive,
-      useEthPath
+      useSysPath
     );
 
     // Deposit new reserve
@@ -251,7 +251,7 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
    *   uint8[] v List of v param for the permit signature
    *   bytes32[] r List of r param for the permit signature
    *   bytes32[] s List of s param for the permit signature
-   *   bool[] useEthPath true if the swap needs to occur using ETH in the routing, false otherwise
+   *   bool[] useSysPath true if the swap needs to occur using SYS in the routing, false otherwise
    * @return SwapParams struct containing decoded params
    */
   function _decodeParams(bytes memory params) internal pure returns (SwapParams memory) {
@@ -264,9 +264,8 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
       uint8[] memory v,
       bytes32[] memory r,
       bytes32[] memory s,
-      bool[] memory useEthPath
-    ) =
-      abi.decode(
+      bool[] memory useSysPath
+    ) = abi.decode(
         params,
         (address[], uint256[], bool[], uint256[], uint256[], uint8[], bytes32[], bytes32[], bool[])
       );
@@ -277,7 +276,7 @@ contract UniswapLiquiditySwapAdapter is BaseUniswapAdapter {
         minAmountsToReceive,
         swapAllBalance,
         PermitParams(permitAmount, deadline, v, r, s),
-        useEthPath
+        useSysPath
       );
   }
 }

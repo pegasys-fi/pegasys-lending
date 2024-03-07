@@ -3,10 +3,10 @@ pragma solidity 0.6.12;
 
 /************
 @title IPriceOracle interface
-@notice Interface for the Aave price oracle.*/
+@notice Interface for the Pegasys price oracle.*/
 interface IPriceOracle {
   /***********
-    @dev returns the asset price in ETH
+    @dev returns the asset price in SYS
      */
   function getAssetPrice(address asset) external view returns (uint256);
 

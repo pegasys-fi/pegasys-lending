@@ -7,7 +7,7 @@ import {
 } from '../../helpers/configuration';
 import { ZERO_ADDRESS } from '../../helpers/constants';
 import {
-  getAaveProtocolDataProvider,
+  getPegasysProtocolDataProvider,
   getAddressById,
   getLendingPool,
   getLendingPoolAddressesProvider,
@@ -19,7 +19,7 @@ import {
   getLendingPoolImpl,
   getProxy,
   getWalletProvider,
-  getWETHGateway,
+  getWSYSGateway,
 } from '../../helpers/contracts-getters';
 import { verifyContract, getParamPerNetwork } from '../../helpers/contracts-helpers';
 import { notFalsyOrZeroAddress } from '../../helpers/misc-utils';
@@ -40,7 +40,7 @@ task('verify:general', 'Verify contracts at Etherscan')
       LendingPoolCollateralManager,
       LendingPoolConfigurator,
       LendingPool,
-      WethGateway,
+      WsysGateway,
     } = poolConfig as ICommonConfiguration;
     const treasuryAddress = await getTreasuryAddress(poolConfig);
 
@@ -82,13 +82,13 @@ task('verify:general', 'Verify contracts at Etherscan')
         ? await getLendingPoolCollateralManagerImpl(lendingPoolCollateralManagerImplAddress)
         : await getLendingPoolCollateralManagerImpl();
 
-      const dataProvider = await getAaveProtocolDataProvider();
+      const dataProvider = await getPegasysProtocolDataProvider();
       const walletProvider = await getWalletProvider();
 
-      const wethGatewayAddress = getParamPerNetwork(WethGateway, network);
-      const wethGateway = notFalsyOrZeroAddress(wethGatewayAddress)
-        ? await getWETHGateway(wethGatewayAddress)
-        : await getWETHGateway();
+      const wsysGatewayAddress = getParamPerNetwork(WsysGateway, network);
+      const wsysGateway = notFalsyOrZeroAddress(wsysGatewayAddress)
+        ? await getWSYSGateway(wsysGatewayAddress)
+        : await getWSYSGateway();
 
       // Address Provider
       console.log('\n- Verifying address provider...\n');
@@ -119,8 +119,8 @@ task('verify:general', 'Verify contracts at Etherscan')
       );
 
       // Test helpers
-      console.log('\n- Verifying  Aave  Provider Helpers...\n');
-      await verifyContract(eContractid.AaveProtocolDataProvider, dataProvider, [
+      console.log('\n- Verifying  Pegasys  Provider Helpers...\n');
+      await verifyContract(eContractid.PegasysProtocolDataProvider, dataProvider, [
         addressesProvider.address,
       ]);
 
@@ -128,9 +128,9 @@ task('verify:general', 'Verify contracts at Etherscan')
       console.log('\n- Verifying  Wallet Balance Provider...\n');
       await verifyContract(eContractid.WalletBalanceProvider, walletProvider, []);
 
-      // WETHGateway
-      console.log('\n- Verifying  WETHGateway...\n');
-      await verifyContract(eContractid.WETHGateway, wethGateway, [
+      // WSYSGateway
+      console.log('\n- Verifying  WSYSGateway...\n');
+      await verifyContract(eContractid.WSYSGateway, wsysGateway, [
         await getWrappedNativeTokenAddress(poolConfig),
       ]);
     }

@@ -1,7 +1,7 @@
 {
-  "name": "@aave/protocol-v2",
-  "version": "1.0.1",
-  "description": "Aave Protocol V2 smart contracts",
+  "name": "@pollum-io/pegasys-lending",
+  "version": "0.0.1",
+  "description": "Pegasys Lending smart contracts",
   "files": [
     "contracts",
     "artifacts"
@@ -12,32 +12,28 @@
     "hardhat:main": "hardhat --network main",
     "compile": "SKIP_LOAD=true hardhat compile",
     "console:fork": "FORK=main hardhat console",
-    "test": "npm run compile && TS_NODE_TRANSPILE_ONLY=1 hardhat test ./test-suites/test-aave/*.spec.ts",
-    "test-amm": "npm run compile && TS_NODE_TRANSPILE_ONLY=1 hardhat test ./test-suites/test-amm/*.spec.ts",
-    "test-amm-scenarios": "npm run compile && TS_NODE_TRANSPILE_ONLY=1 hardhat test ./test-suites/test-amm/__setup.spec.ts test-suites/test-amm/scenario.spec.ts",
-    "test-scenarios": "npm run compile && npx hardhat test test-suites/test-aave/__setup.spec.ts test-suites/test-aave/scenario.spec.ts",
-    "test:main:check-list": "npm run compile && FORK=main TS_NODE_TRANSPILE_ONLY=1 hardhat test  test-suites/test-aave/__setup.spec.ts test-suites/test-aave/mainnet/check-list.spec.ts",
+    "test": "npm run compile && TS_NODE_TRANSPILE_ONLY=1 hardhat test ./test-suites/test-pegasys/*.spec.ts",
+    "test-scenarios": "npm run compile && npx hardhat test test-suites/test-pegasys/__setup.spec.ts test-suites/test-pegasys/scenario.spec.ts",
+    "test:main:check-list": "npm run compile && FORK=main TS_NODE_TRANSPILE_ONLY=1 hardhat test  test-suites/test-pegasys/__setup.spec.ts test-suites/test-pegasys/mainnet/check-list.spec.ts",
     "dev:coverage": "buidler compile --force && buidler coverage --network coverage",
-    "aave:evm:dev:migration": "npm run compile && hardhat aave:dev",
-    "aave:main:add-market-to-registry-from-config": "npm run compile && npm run hardhat:main -- add-market-to-registry --pool Aave",
-    "aave:main:add-market-to-new-registry": "npm run compile && npm run hardhat:main -- add-market-to-registry --pool Aave --verify --deploy-registry",
-    "aave:fork:main": "npm run compile && FORK=main hardhat aave:mainnet",
-    "amm:fork:main": "npm run compile && FORK=main hardhat amm:mainnet",
-    "aave:main:full:migration": "npm run compile && npm run hardhat:main -- aave:mainnet --verify",
-    "aave:main:full:initialize": "npm run compile && FORK=main full:initialize-tokens --pool Aave",
-    "amm:main:full:migration": "npm run compile && npm run hardhat:main -- amm:mainnet --verify",
-    "prettier:check": "npx prettier -c 'tasks/**/*.ts' 'contracts/**/*.sol' 'helpers/**/*.ts'  'test-suites/test-aave/**/*.ts'",
-    "prettier:write": "prettier --write 'tasks/**/*.ts' 'contracts/**/*.sol' 'helpers/**/*.ts'  'test-suites/test-aave/**/*.ts'",
+    "pegasys:evm:dev:migration": "npm run compile && hardhat pegasys:dev",
+    "pegasys:main:add-market-to-registry-from-config": "npm run compile && npm run hardhat:main -- add-market-to-registry --pool Pegasys",
+    "pegasys:main:add-market-to-new-registry": "npm run compile && npm run hardhat:main -- add-market-to-registry --pool Pegasys --verify --deploy-registry",
+    "pegasys:fork:main": "npm run compile && FORK=main hardhat pegasys:mainnet",
+    "pegasys:main:full:migration": "npm run compile && npm run hardhat:main -- pegasys:mainnet --verify",
+    "pegasys:main:full:initialize": "npm run compile && FORK=main full:initialize-tokens --pool Pegasys",
+    "prettier:check": "npx prettier -c 'tasks/**/*.ts' 'contracts/**/*.sol' 'helpers/**/*.ts'  'test-suites/test-pegasys/**/*.ts'",
+    "prettier:write": "prettier --write 'tasks/**/*.ts' 'contracts/**/*.sol' 'helpers/**/*.ts'  'test-suites/test-pegasys/**/*.ts'",
     "ci:test": "npm run compile && npm run test",
     "ci:clean": "rm -rf ./artifacts ./cache ./types",
     "print-contracts:main": "npm run hardhat:main -- print-contracts",
     "main:deployUIProvider": "hardhat --network main deploy-UiPoolDataProvider --verify",
     "main:deployUIIncentivesProviderV2": "hardhat --network main deploy-UiIncentiveDataProviderV2 --verify",
-    "main:deployUniswapRepayAdapter": "hardhat --network main deploy-UniswapRepayAdapter --provider 0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5 --router 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D --weth 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-    "main:UniswapLiquiditySwapAdapter": "hardhat --network main deploy-UniswapLiquiditySwapAdapter  --provider 0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5 --router 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D --weth 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "main:deployUniswapRepayAdapter": "hardhat --network main deploy-UniswapRepayAdapter --provider 0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5 --router 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D --wsys 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "main:UniswapLiquiditySwapAdapter": "hardhat --network main deploy-UniswapLiquiditySwapAdapter  --provider 0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5 --router 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D --wsys 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     "main:ParaSwapLiquiditySwapAdapter": "hardhat --network main deploy-ParaSwapLiquiditySwapAdapter --provider 0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5 --augustusRegistry 0xa68bEA62Dc4034A689AA0F58A76681433caCa663",
-    "mainnet:verify": "npm run hardhat:main verify:general -- --all --pool Aave",
-    "mainnet:verify:tokens": "npm run hardhat:main verify:tokens -- --pool Aave",
+    "mainnet:verify": "npm run hardhat:main verify:general -- --all --pool Pegasys",
+    "mainnet:verify:tokens": "npm run hardhat:main verify:tokens -- --pool Pegasys",
     "print-config:fork:mainnet": "FORK=main hardhat print-config:fork",
     "external:deploy-assets-main": "npm run compile && hardhat --network main external:deploy-new-asset --symbol ${SYMBOL} --verify",
     "prepublishOnly": "npm run compile"
@@ -93,28 +89,21 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged --pattern 'contracts/**/*.sol' --pattern 'helpers/**/*.ts'  --pattern 'test-suites/test-aave/**/*.ts' --pattern 'tasks/**/*.ts'"
+      "pre-commit": "pretty-quick --staged --pattern 'contracts/**/*.sol' --pattern 'helpers/**/*.ts'  --pattern 'test-suites/test-pegasys/**/*.ts' --pattern 'tasks/**/*.ts'"
     }
   },
-  "author": "Aave",
-  "contributors": [
-    "Ernesto Boado <ernesto@aave.com>",
-    "Emilio Frangella <emilio@aave.com>",
-    "Andrey Kozlov <andrey@aave.com>",
-    "David Racero <david.k@aave.com>",
-    "Pol Sendra <pol@aave.com>",
-    "David Truong <david@aave.com>"
-  ],
+  "author": "Aave and Pegasys",
   "license": "AGPLv3",
   "dependencies": {
     "axios-curlirize": "^1.3.7",
     "tmp-promise": "^3.0.2"
   },
   "keywords": [
-    "aave",
+    "pegasys",
     "protocol",
-    "protocol-v2",
-    "ethereum",
+    "lending",
+    "syscoin",
+    "rollux",
     "solidity"
   ]
 }

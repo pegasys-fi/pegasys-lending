@@ -15,9 +15,8 @@ export enum EthereumNetworkNames {
   main = 'main',
 }
 
-export enum AavePools {
+export enum PegasysPools {
   proto = 'proto',
-  amm = 'amm',
 }
 
 export enum eContractid {
@@ -36,7 +35,7 @@ export enum eContractid {
   Proxy = 'Proxy',
   MockAggregator = 'MockAggregator',
   LendingRateOracle = 'LendingRateOracle',
-  AaveOracle = 'AaveOracle',
+  PegasysOracle = 'PegasysOracle',
   DefaultReserveInterestRateStrategy = 'DefaultReserveInterestRateStrategy',
   LendingPoolCollateralManager = 'LendingPoolCollateralManager',
   InitializableAdminUpgradeabilityProxy = 'InitializableAdminUpgradeabilityProxy',
@@ -47,7 +46,7 @@ export enum eContractid {
   DelegationAwareAToken = 'DelegationAwareAToken',
   MockStableDebtToken = 'MockStableDebtToken',
   MockVariableDebtToken = 'MockVariableDebtToken',
-  AaveProtocolDataProvider = 'AaveProtocolDataProvider',
+  PegasysProtocolDataProvider = 'PegasysProtocolDataProvider',
   IERC20Detailed = 'IERC20Detailed',
   StableDebtToken = 'StableDebtToken',
   VariableDebtToken = 'VariableDebtToken',
@@ -58,9 +57,9 @@ export enum eContractid {
   UiPoolDataProvider = 'UiPoolDataProvider',
   UiPoolDataProviderV2 = 'UiPoolDataProviderV2',
   UiPoolDataProviderV2V3 = 'UiPoolDataProviderV2V3',
-  WETHGateway = 'WETHGateway',
-  WETH = 'WETH',
-  WETHMocked = 'WETHMocked',
+  WSYSGateway = 'WSYSGateway',
+  WSYS = 'WSYS',
+  WSYSMocked = 'WSYSMocked',
   SelfdestructTransferMock = 'SelfdestructTransferMock',
   LendingPoolImpl = 'LendingPoolImpl',
   LendingPoolConfiguratorImpl = 'LendingPoolConfiguratorImpl',
@@ -177,7 +176,7 @@ export enum ProtocolErrors {
 }
 
 export type tEthereumAddress = string;
-export type tStringTokenBigUnits = string; // 1 ETH, or 10e6 USDC or 10e18 DAI
+export type tStringTokenBigUnits = string; // 1 SYS, or 10e6 USDC or 10e18 DAI
 export type tBigNumberTokenBigUnits = BigNumber;
 export type tStringTokenSmallUnits = string; // 1 wei, or 1 basic unit of USDC, or 1 basic unit of DAI
 export type tBigNumberTokenSmallUnits = BigNumber;
@@ -186,39 +185,36 @@ export interface iAssetCommon<T> {
   [key: string]: T;
 }
 export interface iAssetBase<T> {
-  WETH: T;
+  WSYS: T;
   USDC: T;
   USDT: T;
-  WSYS: T;
-  WBTC: T;
+  ETH: T;
+  BTC: T;
 }
 
-export type iAssetsWithoutETH<T> = Omit<iAssetBase<T>, 'ETH'>;
+export type iAssetsWithoutSYS<T> = Omit<iAssetBase<T>, 'SYS'>;
 
 export type iAssetsWithoutUSD<T> = Omit<iAssetBase<T>, 'USD'>;
 
-export type iAavePoolAssets<T> = Pick<
+export type iPegasysPoolAssets<T> = Pick<
   iAssetsWithoutUSD<T>,
-  'WETH' | 'USDC' | 'USDT' | 'WSYS' | 'WBTC'
+  'WSYS' | 'USDC' | 'USDT' | 'ETH' | 'BTC'
 >;
 
-export type iLpPoolAssets<T> = Pick<
-  iAssetsWithoutUSD<T>,
-  'WETH' | 'USDC' | 'USDT' | 'WSYS' | 'WBTC'
->;
+export type iLpPoolAssets<T> = Pick<iAssetsWithoutUSD<T>, 'WSYS' | 'USDC' | 'USDT' | 'ETH' | 'BTC'>;
 
-export type iMultiPoolsAssets<T> = iAssetCommon<T> | iAavePoolAssets<T>;
+export type iMultiPoolsAssets<T> = iAssetCommon<T> | iPegasysPoolAssets<T>;
 
-export type iAavePoolTokens<T> = Omit<iAavePoolAssets<T>, 'ETH'>;
+export type iPegasysPoolTokens<T> = Omit<iPegasysPoolAssets<T>, 'SYS'>;
 
-export type iAssetAggregatorBase<T> = iAssetsWithoutETH<T>;
+export type iAssetAggregatorBase<T> = iAssetsWithoutSYS<T>;
 
 export enum TokenContractId {
   WSYS = 'WSYS',
-  WETH = 'WETH',
+  ETH = 'ETH',
   USDC = 'USDC',
   USDT = 'USDT',
-  WBTC = 'WBTC',
+  BTC = 'BTC',
   USD = 'USD',
 }
 
@@ -268,8 +264,7 @@ export interface iEthereumParamsPerNetwork<T> {
 }
 
 export interface iParamsPerPool<T> {
-  [AavePools.proto]: T;
-  [AavePools.amm]: T;
+  [PegasysPools.proto]: T;
 }
 
 export interface iBasicDistributionParams {
@@ -293,7 +288,7 @@ export interface IProtocolGlobalConfig {
   UsdAddress: tEthereumAddress;
   NilAddress: tEthereumAddress;
   OneAddress: tEthereumAddress;
-  AaveReferral: string;
+  PegasysReferral: string;
 }
 
 export interface IMocksConfig {
@@ -324,17 +319,17 @@ export interface IBaseConfiguration {
   LendingRateOracleRatesCommon: iMultiPoolsAssets<IMarketRates>;
   LendingRateOracle: iParamsPerNetwork<tEthereumAddress>;
   TokenDistributor: iParamsPerNetwork<tEthereumAddress>;
-  AaveOracle: iParamsPerNetwork<tEthereumAddress>;
+  PegasysOracle: iParamsPerNetwork<tEthereumAddress>;
   FallbackOracle: iParamsPerNetwork<tEthereumAddress>;
-  ChainlinkAggregator: iParamsPerNetwork<ITokenAddress>;
+  SupraOracle: iParamsPerNetwork<tEthereumAddress>;
   PoolAdmin: iParamsPerNetwork<tEthereumAddress | undefined>;
   PoolAdminIndex: number;
   EmergencyAdmin: iParamsPerNetwork<tEthereumAddress | undefined>;
   EmergencyAdminIndex: number;
   ATokenDomainSeparator: iParamsPerNetwork<string>;
-  WETH: iParamsPerNetwork<tEthereumAddress>;
+  WSYS: iParamsPerNetwork<tEthereumAddress>;
   WrappedNativeToken: iParamsPerNetwork<tEthereumAddress>;
-  WethGateway: iParamsPerNetwork<tEthereumAddress>;
+  WsysGateway: iParamsPerNetwork<tEthereumAddress>;
   ReserveFactorTreasuryAddress: iParamsPerNetwork<tEthereumAddress>;
   IncentivesController: iParamsPerNetwork<tEthereumAddress>;
   StableDebtTokenImplementation?: iParamsPerNetwork<tEthereumAddress>;
@@ -349,8 +344,8 @@ export interface ICommonConfiguration extends IBaseConfiguration {
   Mocks: IMocksConfig;
 }
 
-export interface IAaveConfiguration extends ICommonConfiguration {
-  ReservesConfig: iAavePoolAssets<IReserveParams>;
+export interface IPegasysConfiguration extends ICommonConfiguration {
+  ReservesConfig: iPegasysPoolAssets<IReserveParams>;
 }
 
 export interface IAmmConfiguration extends ICommonConfiguration {
@@ -361,4 +356,4 @@ export interface ITokenAddress {
   [token: string]: tEthereumAddress;
 }
 
-export type PoolConfiguration = ICommonConfiguration | IAaveConfiguration;
+export type PoolConfiguration = ICommonConfiguration | IPegasysConfiguration;
